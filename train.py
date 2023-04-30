@@ -26,7 +26,7 @@ callbacks = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', ver
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
    
-    parser.add_argument('--save_dir',       default='/content/drive/MyDrive/Khoa/vibration_project/RUL/results', type=str)
+    parser.add_argument('--save_dir',       default='/content/drive/MyDrive/Khoa/results/RUL', type=str)
     parser.add_argument('--data_type',      default=['2d', '1d', 'extract'], type=list, help='shape of data. They can be 1d, 2d, extract')
     parser.add_argument('--train_bearing',  default=['Bearing1_1', 'Bearing1_2', 'Bearing2_1','Bearing2_2','Bearing3_1','Bearing3_2'], type=str, nargs='+')   
     parser.add_argument('--test_bearing',   default=['Bearing1_3', 'Bearing1_4', 'Bearing1_5', 'Bearing2_3', 'Bearing2_4', 'Bearing2_5', 'Bearing3_3', 'Bearing3_4', 'Bearing3_5'], type=str, nargs='+')
@@ -34,16 +34,16 @@ def parse_opt(known=False):
     parser.add_argument('--type',           default='XJTU', type=str, help='PHM, XJTU')
     parser.add_argument('--case',           default='case2', type=str, help='case1, case2')
     parser.add_argument('--scaler',         default=None, type=str)
-    parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data/', type=str)
+    parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data_new/data', type=str)
 
     parser.add_argument('--epochs',         default=30, type=int)
-    parser.add_argument('--EC_epochs',      default=100, type=int)
+    parser.add_argument('--EC_epochs',      default=50, type=int)
     parser.add_argument('--batch_size',     default=16, type=int)
-    parser.add_argument('--input_shape',    default=None, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
+    parser.add_argument('--input_shape',    default=32768, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
     
     parser.add_argument('--predict_time', default=False, type=bool)
     parser.add_argument('--mix_model',    default=True,  type=bool)
-    parser.add_argument('--encoder',      default=False, type=bool)
+    parser.add_argument('--encoder',      default=True, type=bool)
     parser.add_argument('--load_weight',  default=False, type=bool)  
     
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
