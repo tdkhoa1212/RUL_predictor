@@ -101,7 +101,7 @@ def main(opt):
     plt.title(opt.type + f' - {name}', fontsize=22)
     plt.legend()
     plt.xlabel("Time", fontsize=18)
-    plt.ylabel("Percentage", fontsize=18)
+    plt.ylabel("RUL", fontsize=18)
     plt.savefig(join(opt.save_dir+'/images', opt.type, f'{name}.png'))
     plt.close()
 
