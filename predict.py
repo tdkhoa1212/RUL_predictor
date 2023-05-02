@@ -91,7 +91,8 @@ def main(opt):
 
     # Simulating the graphs --------------------------------------------------------
     plt.plot(t_label_RUL, c='b', label='Actual RUL')
-    x_RUL = np.arange(len(RUL))
+    x_RUL = np.arange(RUL.shape[0])
+    RUL = RUL.reshape(RUL.shape[0], )
     smoothed_RUL = savgol_filter(RUL, 5, 3)
     plt.plot(smoothed_RUL, c='r', label='Smoothed prediction')
     plt.scatter(x_RUL, smoothed_RUL, c='orange', label='Raw RUL')
