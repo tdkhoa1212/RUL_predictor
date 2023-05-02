@@ -18,7 +18,9 @@ tf.get_logger().setLevel('INFO')
 import logging
 tf.get_logger().setLevel(logging.ERROR)
 logging.getLogger('tensorflow').disabled = True
+from matplotlib.pyplot import figure
 
+figure(figsize=(8, 6), dpi=130)
 
 opt = parse_opt()
 
@@ -90,16 +92,16 @@ def main(opt):
       print(f'\n-----{name}:      R2: {r2}, MAE: {mae_}, RMSE: {rmse_}, Acc: {acc}-----')
 
     # Simulating the graphs --------------------------------------------------------
-    plt.plot(t_label_RUL, c='b', label='Actual RUL')
+    plt.plot(t_label_RUL, c='b', label='Actual RUL', linewidth=7.0)
     x_RUL = np.arange(RUL.shape[0])
     RUL = RUL.reshape(RUL.shape[0], )
-    smoothed_RUL = savgol_filter(RUL, 5, 3)
-    plt.plot(smoothed_RUL, c='r', label='Smoothed prediction')
-    plt.scatter(x_RUL, smoothed_RUL, c='orange', label='Raw RUL')
-    plt.title(opt.type + f' - {name}')
+    smoothed_RUL = savgol_filter(RUL, 8, 2)
+    plt.plot(smoothed_RUL, c='r', label='Smoothed Prediction', linewidth=7.0)
+    plt.scatter(x_RUL, RUL, c='orange', label='Raw Prediction', s=100)
+    plt.title(opt.type + f' - {name}', fontsize=22)
     plt.legend()
-    plt.xlabel("Time")
-    plt.ylabel("Percentage")
+    plt.xlabel("Time", fontsize=18)
+    plt.ylabel("Percentage", fontsize=18)
     plt.savefig(join(opt.save_dir+'/images', opt.type, f'{name}.png'))
     plt.close()
 
