@@ -7,9 +7,11 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from os.path import join
 import os
+import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import warnings
+from scipy.signal import savgol_filter
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 warnings.simplefilter("ignore")
 tf.get_logger().setLevel('INFO')
@@ -88,9 +90,15 @@ def main(opt):
       print(f'\n-----{name}:      R2: {r2}, MAE: {mae_}, RMSE: {rmse_}, Acc: {acc}-----')
 
     # Simulating the graphs --------------------------------------------------------
-    plt.plot(t_label_RUL, c='b')
-    plt.plot(RUL, c='r')
+    plt.plot(t_label_RUL, c='b', label='Actual RUL')
+    x_RUL = np.arange(len(RUL))
+    smoothed_RUL = savgol_filter(RUL, 5, 3)
+    plt.plot(smoothed_RUL, c='r', label='Smoothed prediction')
+    plt.scatter(x_RUL, smoothed_RUL, c='orange', label='Raw RUL')
     plt.title(opt.type + f' - {name}')
+    plt.legend()
+    plt.xlabel("Time")
+    plt.ylabel("Percentage")
     plt.savefig(join(opt.save_dir, opt.type, f'{name}.png'))
     plt.close()
 
