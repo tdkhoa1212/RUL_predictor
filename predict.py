@@ -99,7 +99,7 @@ def main(opt):
     plt.legend()
     plt.xlabel("Time")
     plt.ylabel("Percentage")
-    plt.savefig(join(opt.save_dir, opt.type, f'{name}.png'))
+    plt.savefig(join(opt.save_dir+'/images', opt.type, f'{name}.png'))
     plt.close()
 
     
