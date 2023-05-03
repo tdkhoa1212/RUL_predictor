@@ -1,23 +1,17 @@
+
+# Implementation of matplotlib function
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.signal import savgol_filter
-from matplotlib.pyplot import figure
-
-figure(figsize=(8, 6), dpi=130)
-
-
-#day one, the age and speed of 13 cars:
-y = np.array([99,86,87,88,111,86,103,87,94,78,77,85,86])
-x = np.arange(len(y))
-plt.scatter(x, y, c='blue', label="Actual RUL")
-
-#day two, the age and speed of 15 cars:
-y = np.array([100,105,84,105,90,99,90,95,94,100,79,112,91,80,85])
-x = np.arange(len(y))
-yhat = savgol_filter(y, 6, 2)
-plt.plot(x, yhat, c='orange', label='Smoothed prediction',linewidth=7.0)
-plt.scatter(x, y, c='red', label="Raw prediction", s=100)
-plt.xlabel("Time", fontsize=20)
-plt.ylabel("Percentage", fontsize=20)
-plt.legend()
-plt.show()
+from matplotlib.colors import LogNorm
+      
+dx, dy = 0.015, 0.05
+y, x = np.mgrid[slice(-4, 4 + dy, dy),
+                slice(-4, 4 + dx, dx)]
+z = (1 - x / 3. + x ** 5 + y ** 5) * np.exp(-x ** 2 - y ** 2)
+z = z[:-1, :-1]
+z_min, z_max = -np.abs(z).max(), np.abs(z).max()
+  
+c = plt.imshow(z, cmap ='Greens', vmin = z_min, vmax = z_max,
+                 extent =[x.min(), x.max(), y.min(), y.max()],
+                    interpolation ='nearest', origin ='lower')
+print(z.shape)

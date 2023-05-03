@@ -107,7 +107,7 @@ def main(opt):
     plt.savefig(join(opt.save_dir+'/images', opt.type, f'{name}.png'))
     plt.close()
 
-def denoiseComparison(train_1D, opt):
+def denoiseComparison(train_1D, train_2D, opt):
   raw_signal = train_1D[0]
   print(f"\nShape of raw signal: {raw_signal.shape}\n")
   model = autoencoder_model('XJTU')
@@ -124,10 +124,15 @@ def denoiseComparison(train_1D, opt):
   plt.xlabel('Time')
   plt.ylabel('Magnitude')
   plt.legend()
-  plt.savefig()
-  plt.show(join(opt.save_dir+'/images', f'compareSignals.png'))
-
+  plt.savefig(join(opt.save_dir+'/images', f'compareSignals.png'))
+  plt.show()
+  
+  image = np.squeeze(train_2D[0][:, :, 0])
+  plt.imshow(image)
+  plt.savefig(join(opt.save_dir+'/images', f'2DImage.png'))
+  plt.show()
+  
 if __name__ == '__main__':
   warnings.filterwarnings("ignore", category=FutureWarning)
   # main(opt)
-  denoiseComparison(train_1D, opt)
+  denoiseComparison(train_1D, train_2D, opt)
