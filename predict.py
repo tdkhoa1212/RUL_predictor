@@ -5,6 +5,7 @@ from model.MIX_1D_2D import mix_model_PHM, mix_model_XJTU
 from utils.tools import all_matric_XJTU, all_matric_PHM, back_onehot
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
+from model.autoencoder import autoencoder_model
 from os.path import join
 import os
 import numpy as np
@@ -30,7 +31,8 @@ if opt.type == 'PHM' and opt.case == 'case1':
 elif opt.type == 'PHM' and opt.case == 'case2':
   from utils.load_PHM_data import test_1D, test_2D, test_extract, test_label_Con, test_label_RUL, test_idx
 else:
-  from utils.load_XJTU_data import test_1D, test_2D, test_extract, test_label_Con, test_label_RUL, test_idx
+  from utils.load_XJTU_data import train_1D, train_2D, train_extract, train_label_Con, train_label_RUL,\
+                                     test_1D, test_2D, test_extract, test_label_Con, test_label_RUL
 
 def Predict(data, opt):
   # Loading model ############################################################
@@ -105,7 +107,27 @@ def main(opt):
     plt.savefig(join(opt.save_dir+'/images', opt.type, f'{name}.png'))
     plt.close()
 
-    
+def denoiseComparison(train_1D, opt):
+  raw_signal = train_1D[0]
+  print(f"\nShape of raw signal: {raw_signal.shape}\n")
+  model = autoencoder_model('XJTU')
+  EC_XJTU_path = join(opt.save_dir, f'XJTU.h5')
+  model.load_weights(EC_XJTU_path)
+
+  denoised_signal = model.predict(raw_signal)
+
+  # Demonstrating signal-----------------
+  x_raw = raw_signal[:, 0]
+  x_denoised = denoised_signal[:, 0]
+  plt.plot(x_raw, c='b', linestyle='dashed', label='Raw signal')
+  plt.plot(x_denoised, c='orange', label='Denoised signal')
+  plt.xlabel('Time')
+  plt.ylabel('Magnitude')
+  plt.legend()
+  plt.savefig()
+  plt.show(join(opt.save_dir+'/images', f'compareSignals.png'))
+
 if __name__ == '__main__':
   warnings.filterwarnings("ignore", category=FutureWarning)
-  main(opt)
+  # main(opt)
+  denoiseComparison(train_1D, opt)
