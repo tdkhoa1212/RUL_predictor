@@ -97,7 +97,7 @@ def main(opt):
     RUL = RUL.reshape(RUL.shape[0], )
     smoothed_RUL = savgol_filter(RUL, 8, 2)
     plt.plot(smoothed_RUL, c='r', label='Smoothed Prediction', linewidth=7.0)
-    plt.scatter(x_RUL, RUL, c='orange', label='Raw Prediction', s=100)
+    plt.scatter(x_RUL, RUL, c='orange', label='Raw Prediction', s=50)
     plt.title(opt.type + f' - {name}', fontsize=18)
     plt.legend()
     plt.xlabel("Time", fontsize=18)
