@@ -43,7 +43,7 @@ def parse_opt(known=False):
     
     parser.add_argument('--predict_time', default=False, type=bool)
     parser.add_argument('--mix_model',    default=True,  type=bool)
-    parser.add_argument('--encoder',      default=False, type=bool)
+    parser.add_argument('--encoder',      default=True, type=bool)
     parser.add_argument('--load_weight',  default=True, type=bool)  
     
     opt = parser.parse_known_args()[0] if known else parser.parse_args()

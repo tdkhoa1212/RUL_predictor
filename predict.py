@@ -108,17 +108,18 @@ def main(opt):
     plt.close()
 
 def denoiseComparison(train_1D, train_2D, opt):
-  raw_signal = train_1D[0]
+  raw_signal = train_1D[0].reshape(1, 2, 32768)
   print(f"\nShape of raw signal: {raw_signal.shape}\n")
-  model = autoencoder_model('XJTU')
   EC_XJTU_path = join(opt.save_dir, f'XJTU.h5')
+  model = autoencoder_model('XJTU')
+  model.summary()
   model.load_weights(EC_XJTU_path)
 
   denoised_signal = model.predict(raw_signal)
 
   # Demonstrating signal-----------------
-  x_raw = raw_signal[:, 0]
-  x_denoised = denoised_signal[:, 0]
+  x_raw = np.squeeze(raw_signal.reshape(32768, 2)[:, 0])
+  x_denoised = np.squeeze(denoised_signal.reshape(32768, 2)[:, 0])
   plt.plot(x_raw, c='b', linestyle='dashed', label='Raw signal')
   plt.plot(x_denoised, c='orange', label='Denoised signal')
   plt.xlabel('Time')
