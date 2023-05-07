@@ -8,7 +8,8 @@ def train_EC(train_data, type_, weights, opt):
     model = autoencoder_model(type_)
     model.summary()
     model.compile(optimizer=tf.keras.optimizers.Adam(1e-3),
-                  loss=tf.keras.losses.Huber(reduction=tf.keras.losses.Reduction.NONE))
+                  loss=tf.keras.losses.MeanSquaredError(reduction=tf.keras.losses.Reduction.NONE))
+    
     if exists(weights):
       model.load_weights(weights)
     model.fit(train_data, train_data,
