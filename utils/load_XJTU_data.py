@@ -156,7 +156,6 @@ else:
     train_1D, train_2D, train_extract, train_label_RUL, train_label_Con = getting_data(saved_dir, opt.train_bearing, opt)
     s_0, s_1, s_2 = train_1D.shape
     train_1D = train_1D.reshape((s_0, s_2, s_1))
-    train_1D /= np.abs(np.max(train_1D))
     train_EC(train_1D, 'XJTU', EC_XJTU_path, opt)
 
   # Saving the converted data ==================================================================================
