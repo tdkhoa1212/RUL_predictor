@@ -120,8 +120,8 @@ def denoiseComparison(train_1D, train_2D, opt):
   # Demonstrating signal-----------------
   x_raw = np.squeeze(raw_signal.reshape(32768, 2)[:, 0]) 
   x_denoised = np.squeeze(denoised_signal.reshape(32768, 2)[:, 0]) 
-  plt.plot(x_raw[:200], c='b', linestyle='dashed', label='Raw signal')
-  plt.plot(x_denoised[:200], c='orange', label='Denoised signal')
+  plt.plot(x_raw[:200], c='black', label='Raw signal')
+  plt.plot(x_denoised[:200], c='orange', linestyle='dashed', label='Denoised signal')
   plt.xlabel('Time')
   plt.ylabel('Magnitude')
   plt.legend()
