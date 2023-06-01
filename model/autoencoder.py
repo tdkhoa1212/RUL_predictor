@@ -13,9 +13,9 @@ def autoencoder_model(type_):
       x2 = 32768
     L1 = LSTM(512, return_sequences=True, activation="relu")(inputs)
     L1 = Dropout(0.2)(L1)
-    L2 = LSTM(256, return_sequences=False, activation="relu")(L1)
+    L2 = LSTM(64, return_sequences=False, activation="relu")(L1)
     L3 = RepeatVector(x1)(L2)
-    L4 = LSTM(256, return_sequences=True, activation="relu")(L3)
+    L4 = LSTM(64, return_sequences=True, activation="relu")(L3)
     L5 = LSTM(512, return_sequences=True, activation="relu")(L4)
     L5 = Dropout(0.2)(L5)
     output = TimeDistributed(Dense(x2))(L5)    
