@@ -276,7 +276,8 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               if type_data=='1d' or type_data=='extract':
                 if opt.encoder:
                     x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
-                    x_ = model.predict(x_)
+                    raw_signal_filter = np.where(x_>0, 1, -1)
+                    x_ = raw_signal_filter * model.predict(x_*raw_signal_filter)
                     x_ = np.squeeze(x_)
                     x_ = x_.reshape(x_.shape[1], x_.shape[0])
                 x_ = x_.tolist()
@@ -302,7 +303,8 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               if type_data=='1d' or type_data=='extract':
                 if opt.encoder:
                     x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
-                    x_ = model.predict(x_)
+                    raw_signal_filter = np.where(x_>0, 1, -1)
+                    x_ = raw_signal_filter * model.predict(x_*raw_signal_filter)
                     x_ = np.squeeze(x_)
                     x_ = x_.reshape(x_.shape[1], x_.shape[0])
                 x_ = x_.tolist()
