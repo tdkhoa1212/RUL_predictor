@@ -36,7 +36,7 @@ def parse_opt(known=False):
     parser.add_argument('--scaler',         default=None, type=str)
     parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data_new/data', type=str)
 
-    parser.add_argument('--epochs',         default=30, type=int)
+    parser.add_argument('--epochs',         default=50, type=int)
     parser.add_argument('--EC_epochs',      default=50, type=int)
     parser.add_argument('--batch_size',     default=32, type=int)
     parser.add_argument('--input_shape',    default=2560, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
