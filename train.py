@@ -70,10 +70,9 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
       print(f'\nLoad weight: {weight_path}\n')
       network.load_weights(weight_path)
   callback = tf.keras.callbacks.EarlyStopping(monitor='val_acc', patience=1)
-  network.compile(optimizer=tf.keras.optimizers.RMSprop(1e-4),
-                  loss=[tf.keras.losses.MeanSquaredLogarithmicError()], 
-                  metrics=['mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()], 
-                  loss_weights=[1, 0.1],
+  network.compile(optimizer=tf.keras.optimizers.RMSprop(1e-3),
+                  loss=tf.keras.losses.MeanSquaredLogarithmicError(), 
+                  metrics=['mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()]
 #                   run_eagerly=True
                     ) # https://keras.io/api/losses/ 
   network.summary()
@@ -119,7 +118,7 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
       print(f'\nLoad weight: {weight_path}\n')
       network.load_weights(weight_path)
   callback = tf.keras.callbacks.EarlyStopping(monitor='val_acc', patience=1)
-  network.compile(optimizer=tf.keras.optimizers.RMSprop(1e-4),
+  network.compile(optimizer=tf.keras.optimizers.Adam(1e-4),
                   loss=['categorical_crossentropy', tf.keras.losses.MeanSquaredLogarithmicError()], 
                   metrics=['acc', 'mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()], 
                   loss_weights=[0.01, 1],
