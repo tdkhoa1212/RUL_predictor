@@ -132,4 +132,4 @@ def mix_model_PHM(opt, cnn_1d_model, resnet_50, lstm_extracted_model, input_1D, 
   RUL = Dense(1, 
               activation='sigmoid', 
               name='RUL')(merged_value_0)
-  return Condition, RUL
+  return RUL
