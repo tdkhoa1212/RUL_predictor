@@ -4,6 +4,13 @@ from model.LSTM import lstm_extracted_model, lstm_model
 from utils.tools import to_onehot, scaler_transform
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MaxAbsScaler
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import Normalizer
+from sklearn.preprocessing import QuantileTransformer
+from sklearn.preprocessing import PowerTransformer
 import tensorflow_addons as tfa
 import argparse
 import os
@@ -52,12 +59,25 @@ def parse_opt(known=False):
 # Train and test for PHM data ############################################################################################
 def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, test_2D, test_extract, test_label_RUL):  
   if opt.scaler != None:
-    train_1D = scaler_transform(train_1D, opt.scaler)
-    train_2D = scaler_transform(train_2D, opt.scaler)
-    train_extract = scaler_transform(train_extract, opt.scaler)
-    test_1D = scaler_transform(test_1D, opt.scaler)
-    test_2D = scaler_transform(test_2D, opt.scaler)
-    test_extract = scaler_transform(test_extract, opt.scaler)
+    print(f'\nUse scaler: {opt.scaler}--------------\n')
+    if opt.scaler == 'MinMaxScaler':
+      scaler = MinMaxScaler
+    if opt.scaler == 'MaxAbsScaler':
+      scaler = MaxAbsScaler
+    if opt.scaler == 'StandardScaler':
+      scaler = StandardScaler
+    if opt.scaler == 'RobustScaler':
+      scaler = RobustScaler
+    if opt.scaler == 'Normalizer':
+      scaler = Normalizer
+    if opt.scaler == 'QuantileTransformer':
+      scaler = QuantileTransformer
+    if opt.scaler == 'PowerTransformer':
+      scaler = PowerTransformer
+    train_1D = scaler_transform(train_1D, scaler)
+    train_extract = scaler_transform(train_extract, scaler)
+    test_1D = scaler_transform(test_1D, scaler)
+    test_extract = scaler_transform(test_extract, scaler)
   
   val_2D, val_1D, val_extract, val_label_RUL = test_2D, test_1D, test_extract, test_label_RUL
   val_data = [val_1D, val_2D, val_extract]
