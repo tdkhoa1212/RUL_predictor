@@ -352,6 +352,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
           scaler = QuantileTransformer
         if opt.scaler == 'PowerTransformer':
           scaler = PowerTransformer
+        print(f'\nUse scaler: {opt.scaler}--------------\n')
 
         if opt.scaler != None:
           hor_data = np.array(data['x'])[:, :, 0]

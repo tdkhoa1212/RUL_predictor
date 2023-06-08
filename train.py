@@ -1,7 +1,7 @@
 from model.MIX_1D_2D import mix_model_PHM, mix_model_XJTU
 from model.resnet import resnet_101
 from model.LSTM import lstm_extracted_model, lstm_model
-from utils.tools import to_onehot
+from utils.tools import to_onehot, scaler_transform
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 import tensorflow_addons as tfa
@@ -27,7 +27,7 @@ def parse_opt(known=False):
     parser = argparse.ArgumentParser()
    
     parser.add_argument('--save_dir',       default='/content/drive/MyDrive/Khoa/results/RUL', type=str)
-    parser.add_argument('--data_type',      default=['2d', '1d', 'extract'], type=list, help='shape of data. They can be 1d, 2d, extract')
+    parser.add_argument('--data_type',      default=['1d', '2d', 'extract'], type=list, help='shape of data. They can be 1d, 2d, extract')
     parser.add_argument('--train_bearing',  default=['Bearing1_2', 'Bearing1_3', 'Bearing1_4','Bearing1_5','Bearing1_6','Bearing1_7'], type=str, nargs='+')   
     parser.add_argument('--test_bearing',   default=['Bearing1_1'], type=str, nargs='+')
     parser.add_argument('--condition',      default=None, type=str, help='c_1, c_2, c_3, c_all')
@@ -51,6 +51,14 @@ def parse_opt(known=False):
 
 # Train and test for PHM data ############################################################################################
 def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, test_2D, test_extract, test_label_RUL):  
+  if opt.scaler != None:
+    train_1D = scaler_transform(train_1D, opt.scaler)
+    train_2D = scaler_transform(train_2D, opt.scaler)
+    train_extract = scaler_transform(train_extract, opt.scaler)
+    test_1D = scaler_transform(test_1D, opt.scaler)
+    test_2D = scaler_transform(test_2D, opt.scaler)
+    test_extract = scaler_transform(test_extract, opt.scaler)
+  
   val_2D, val_1D, val_extract, val_label_RUL = test_2D, test_1D, test_extract, test_label_RUL
   val_data = [val_1D, val_2D, val_extract]
 
