@@ -8,7 +8,7 @@ from model.LSTM import TransformerLayer
 from keras import regularizers
 import keras.backend as K
 
-def fully_concatenate(hidden_out_1D, hidden_out_2D, hidden_out_extracted, training=None, fully=None):
+def fully_concatenate(hidden_out_1D, hidden_out_2D, hidden_out_extracted, training=None, fully=False):
     if fully:  
       # Fully connected layer 1 ###################################################################
       hidden_out_1D = BatchNormalization()(hidden_out_1D, training=training)

@@ -32,11 +32,11 @@ def parse_opt(known=False):
     parser.add_argument('--test_bearing',   default=['Bearing1_1'], type=str, nargs='+')
     parser.add_argument('--condition',      default=None, type=str, help='c_1, c_2, c_3, c_all')
     parser.add_argument('--type',           default='PHM', type=str, help='PHM, XJTU')
-    parser.add_argument('--case',           default='case2', type=str, help='case1, case2')
-    parser.add_argument('--scaler',         default=None, type=str)
+    parser.add_argument('--case',           default='case1', type=str, help='case1, case2')
+    parser.add_argument('--scaler',         default='PowerTransformer', type=str)
     parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data_new/data', type=str)
 
-    parser.add_argument('--epochs',         default=50, type=int)
+    parser.add_argument('--epochs',         default=30, type=int)
     parser.add_argument('--EC_epochs',      default=100, type=int)
     parser.add_argument('--batch_size',     default=16, type=int)
     parser.add_argument('--input_shape',    default=2560, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
@@ -70,7 +70,7 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
       print(f'\nLoad weight: {weight_path}\n')
       network.load_weights(weight_path)
   callback = tf.keras.callbacks.EarlyStopping(monitor='val_acc', patience=1)
-  network.compile(optimizer=tf.keras.optimizers.RMSprop(1e-3),
+  network.compile(optimizer=tf.keras.optimizers.Adam(1e-3),
                   loss=tf.keras.losses.MeanSquaredLogarithmicError(), 
                   metrics=['mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()]
 #                   run_eagerly=True
