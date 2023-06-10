@@ -43,7 +43,7 @@ def parse_opt(known=False):
     parser.add_argument('--scaler',         default='PowerTransformer', type=str)
     parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data_new/data', type=str)
 
-    parser.add_argument('--epochs',         default=30, type=int)
+    parser.add_argument('--epochs',         default=20, type=int)
     parser.add_argument('--EC_epochs',      default=100, type=int)
     parser.add_argument('--batch_size',     default=16, type=int)
     parser.add_argument('--input_shape',    default=2560, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
@@ -51,7 +51,7 @@ def parse_opt(known=False):
     parser.add_argument('--predict_time', default=False, type=bool)
     parser.add_argument('--mix_model',    default=True,  type=bool)
     parser.add_argument('--encoder',      default=False, type=bool)
-    parser.add_argument('--load_weight',  default=False, type=bool)  
+    parser.add_argument('--load_weight',  default=True, type=bool)  
     
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
@@ -98,7 +98,7 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
       print(f'\nLoad weight: {weight_path}\n')
       network.load_weights(weight_path)
   callback = tf.keras.callbacks.EarlyStopping(monitor='val_acc', patience=1)
-  network.compile(optimizer=tf.keras.optimizers.experimental.RMSprop(1e-4),
+  network.compile(optimizer=tf.keras.optimizers.RMSprop(1e-4),
                   loss=tf.keras.losses.MeanSquaredLogarithmicError(), 
                   metrics=['mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()]
 #                   run_eagerly=True
@@ -146,7 +146,7 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
       print(f'\nLoad weight: {weight_path}\n')
       network.load_weights(weight_path)
   callback = tf.keras.callbacks.EarlyStopping(monitor='val_acc', patience=1)
-  network.compile(optimizer=tf.keras.optimizers.experimental.RMSprop(1e-4),
+  network.compile(optimizer=tf.keras.optimizers.RMSprop(1e-4),
                   loss=['categorical_crossentropy', tf.keras.losses.MeanSquaredLogarithmicError()], 
                   metrics=['acc', 'mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()], 
                   loss_weights=[0.01, 1],
