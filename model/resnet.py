@@ -1,11 +1,6 @@
 import tensorflow as tf
 from model.residual_block import make_basic_block_layer, make_bottleneck_layer
-from model.LSTM import TransformerLayer
-from tensorflow.keras.layers import Conv1D, Activation, Dense, \
-                                    concatenate, BatchNormalization, GlobalAveragePooling1D, \
-                                    Input, MaxPooling1D, Lambda, \
-                                    GlobalAveragePooling2D, ReLU, MaxPooling2D, \
-                                    Flatten, Dropout, LSTM, Reshape
+from tensorflow.keras.layers import Dropout
 
 class ResNetTypeI(tf.keras.Model):
     def __init__(self, opt, layer_params):
@@ -33,12 +28,12 @@ class ResNetTypeI(tf.keras.Model):
                                              stride=2)
 
         self.avgpool = tf.keras.layers.GlobalAveragePooling2D()
+        self.Dropout = Dropout(0.2)
         self.fc = tf.keras.layers.Dense(units=opt.num_classes, activation=tf.keras.activations.softmax)
         
     def call(self, inputs, training=None, mask=None):
         x = self.conv1(inputs)
         x = self.bn1(x, training=training)
-        x = tf.nn.relu(x)
         x = self.pool1(x)
         x = self.layer1(x, training=training)
         x = self.layer2(x, training=training)
@@ -76,16 +71,20 @@ class ResNetTypeII(tf.keras.Model):
         self.avgpool = tf.keras.layers.GlobalAveragePooling2D()
         self.expand_dims = tf.expand_dims
         self.fc = tf.keras.layers.Dense(units=1024, activation='relu')
-      
+        self.Dropout = Dropout(0.2)
+        
     def call(self, inputs, training=None, mask=None):
         x = self.conv1(inputs)
         x = self.bn1(x, training=training)
-        x = tf.nn.relu(x)
         x = self.pool1(x)
         x = self.layer1(x, training=training)
+        x = self.Dropout(x, training=training)
         x = self.layer2(x, training=training)
+        x = self.Dropout(x, training=training)
         x = self.layer3(x, training=training)
+        x = self.Dropout(x, training=training)
         x = self.layer4(x, training=training)
+        x = self.Dropout(x, training=training)
         # x = self.avgpool(x)
         return x
 

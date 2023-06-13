@@ -14,7 +14,7 @@ def TransformerLayer(x, c, num_heads=16, training=None):
                                      kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
                                      bias_regularizer=regularizers.l2(1e-4),
                                      activity_regularizer=regularizers.l2(1e-5))(x)
-    x = Dropout(0.2)(x, training=training)
+    x = Dropout(0.3)(x, training=training)
     ma  = MultiHeadAttention(head_size=num_heads, num_heads=num_heads)([x, x, x]) 
     ma = tf.keras.layers.Dense(c,   activation='relu',
                                      kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
@@ -44,6 +44,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block, training):
               name=conv_name_base + '2a')(input_tensor)
     x = BatchNormalization(name=bn_name_base + '2a')(x, training=training)
     x = Activation('relu')(x)
+    x = Dropout(0.2)(x, training=training)
 
     x = Conv1D(filters,
                kernel_size=kernel_size,
@@ -62,6 +63,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block, training):
 
     x = BatchNormalization()(x, training=training)
     x = Activation('relu')(x)
+    x = Dropout(0.2)(x, training=training)
     return x
 
 def lstm_model(opt, training=None, inputs=None):
@@ -110,6 +112,7 @@ def lstm_extracted_model(opt, training=None, inputs=None):
                kernel_regularizer=regularizers.l2(l=0.0001))(inputs)
   x = BatchNormalization()(x, training=training)
   x = Activation('relu')(x)
+  x = Dropout(0.2)(x, training=training)
   x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
 
   x = Conv1D(56,
@@ -120,5 +123,6 @@ def lstm_extracted_model(opt, training=None, inputs=None):
                kernel_regularizer=regularizers.l2(l=0.0001))(x)
   x = BatchNormalization()(x, training=training)
   x = Activation('relu')(x)
+  x = Dropout(0.2)(x, training=training)
   x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
   return x
