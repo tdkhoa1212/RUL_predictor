@@ -135,5 +135,5 @@ def denoiseComparison(train_1D, train_2D, opt):
   
 if __name__ == '__main__':
   warnings.filterwarnings("ignore", category=FutureWarning)
-  # main(opt)
-  denoiseComparison(train_1D, train_2D, opt)
+  main(opt)
+  # denoiseComparison(train_1D, train_2D, opt)
