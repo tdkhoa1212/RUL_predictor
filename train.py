@@ -37,7 +37,7 @@ def parse_opt(known=False):
     parser.add_argument('--data_type',      default=['1d', '2d', 'extract'], type=list, help='shape of data. They can be 1d, 2d, extract')
     parser.add_argument('--train_bearing',  default=['Bearing1_2', 'Bearing1_3', 'Bearing1_4','Bearing1_5','Bearing1_6','Bearing1_7'], type=str, nargs='+')   
     parser.add_argument('--test_bearing',   default=['Bearing1_1'], type=str, nargs='+')
-    parser.add_argument('--condition',      default=None, type=str, help='c_1, c_2, c_3, c_all')
+    parser.add_argument('--condition',      default='c_all', type=str, help='c_1, c_2, c_3, c_all')
     parser.add_argument('--type',           default='PHM', type=str, help='PHM, XJTU')
     parser.add_argument('--case',           default='case2', type=str, help='case1, case2')
     parser.add_argument('--scaler',         default='PowerTransformer', type=str)
