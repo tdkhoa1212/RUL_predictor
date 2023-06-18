@@ -67,13 +67,10 @@ def main(opt):
     print(f'\nShape 1D of {name} data: {t_1D.shape}')
     print(f'Shape 2D of {name} data: {t_2D.shape}')
 
-    t_1D_filter = np.where(t_1D>0, 1, -1)
-    t_extract_filter = np.where(t_extract>0, 1, -1)
-
     if opt.type == 'PHM' and opt.case == 'case1':
-      RUL = Predict([t_1D*t_1D_filter, t_2D, t_extract*t_extract_filter], opt)
+      RUL = Predict([t_1D, t_2D, t_extract], opt)
     else:
-      Condition, RUL = Predict([t_1D*t_1D_filter, t_2D, t_extract*t_extract_filter], opt)
+      Condition, RUL = Predict([t_1D, t_2D, t_extract], opt)
 
     if opt.type == 'PHM' and opt.case == 'case1':
       t_label_RUL = test_label_RUL[num: num+test_idx[name]]
