@@ -78,13 +78,13 @@ class ResNetTypeII(tf.keras.Model):
         x = self.bn1(x, training=training)
         x = self.pool1(x)
         x = self.layer1(x, training=training)
-        x = self.Dropout(x, training=training)
+        # x = self.Dropout(x, training=training)
         x = self.layer2(x, training=training)
-        x = self.Dropout(x, training=training)
+        # x = self.Dropout(x, training=training)
         x = self.layer3(x, training=training)
-        x = self.Dropout(x, training=training)
+        # x = self.Dropout(x, training=training)
         x = self.layer4(x, training=training)
-        x = self.Dropout(x, training=training)
+        # x = self.Dropout(x, training=training)
         # x = self.avgpool(x)
         return x
 
