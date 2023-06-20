@@ -121,6 +121,27 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
 
 # Train and test for XJTU data ############################################################################################
 def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con):  
+  if opt.scaler != None:
+    print(f'\nUse scaler: {opt.scaler}--------------\n')
+    if opt.scaler == 'MinMaxScaler':
+      scaler = MinMaxScaler
+    if opt.scaler == 'MaxAbsScaler':
+      scaler = MaxAbsScaler
+    if opt.scaler == 'StandardScaler':
+      scaler = StandardScaler
+    if opt.scaler == 'RobustScaler':
+      scaler = RobustScaler
+    if opt.scaler == 'Normalizer':
+      scaler = Normalizer
+    if opt.scaler == 'QuantileTransformer':
+      scaler = QuantileTransformer
+    if opt.scaler == 'PowerTransformer':
+      scaler = PowerTransformer
+    train_1D = scaler_transform(train_1D, scaler)
+    train_extract = scaler_transform(train_extract, scaler)
+    test_1D = scaler_transform(test_1D, scaler)
+    test_extract = scaler_transform(test_extract, scaler)
+  
   train_label_Con = to_onehot(train_label_Con)
   test_label_Con  = to_onehot(test_label_Con)
 
