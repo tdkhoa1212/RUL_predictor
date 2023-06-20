@@ -1,5 +1,5 @@
 from train import parse_opt
-from model.resnet import resnet_101
+from model.resnet import resnet_101, resnet_34
 from model.LSTM import lstm_extracted_model, lstm_model
 from model.MIX_1D_2D import mix_model_PHM, mix_model_XJTU
 from utils.tools import all_matric_XJTU, all_matric_PHM, back_onehot
@@ -41,10 +41,10 @@ def Predict(data, opt):
   input_2D = Input((128, 128, 2), name='CNN_input')
 
   if opt.type == 'PHM' and opt.case == 'case1':
-    RUL = mix_model_PHM(opt, lstm_model, resnet_101, lstm_extracted_model, input_1D, input_2D, input_extracted, False)
+    RUL = mix_model_PHM(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, False)
     network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=RUL)
   else:
-    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_101, lstm_extracted_model, input_1D, input_2D, input_extracted, False)
+    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, False)
     network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
 
   # Loading weights ############################################################
