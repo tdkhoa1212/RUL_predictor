@@ -6,6 +6,13 @@ from utils.tools import all_matric_XJTU, all_matric_PHM, back_onehot
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from model.autoencoder import autoencoder_model
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MaxAbsScaler
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import Normalizer
+from sklearn.preprocessing import QuantileTransformer
+from sklearn.preprocessing import PowerTransformer
 from os.path import join
 import os
 import numpy as np
@@ -64,6 +71,27 @@ def main(opt):
   num = 0
   for name in opt.test_bearing:
     t_1D, t_2D, t_extract = test_1D[num: num+test_idx[name]], test_2D[num: num+test_idx[name]], test_extract[num: num+test_idx[name]]
+
+    if opt.scaler != None:
+      print(f'\nUse scaler: {opt.scaler}--------------\n')
+      if opt.scaler == 'MinMaxScaler':
+        scaler = MinMaxScaler
+      if opt.scaler == 'MaxAbsScaler':
+        scaler = MaxAbsScaler
+      if opt.scaler == 'StandardScaler':
+        scaler = StandardScaler
+      if opt.scaler == 'RobustScaler':
+        scaler = RobustScaler
+      if opt.scaler == 'Normalizer':
+        scaler = Normalizer
+      if opt.scaler == 'QuantileTransformer':
+        scaler = QuantileTransformer
+      if opt.scaler == 'PowerTransformer':
+        scaler = PowerTransformer
+      t_1D = scaler_transform(t_1D, scaler)
+      t_extract = scaler_transform(t_extract, scaler)
+
+
     print(f'\nShape 1D of {name} data: {t_1D.shape}')
     print(f'Shape 2D of {name} data: {t_2D.shape}')
 
@@ -75,6 +103,7 @@ def main(opt):
     if opt.type == 'PHM' and opt.case == 'case1':
       t_label_RUL = test_label_RUL[num: num+test_idx[name]]
       num += test_idx[name]
+      print(RUL)
       r2, mae_, mse_ = all_matric_PHM(t_label_RUL, RUL)
     else:
       Condition = back_onehot(Condition)
