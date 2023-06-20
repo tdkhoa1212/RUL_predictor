@@ -1,5 +1,5 @@
 from model.MIX_1D_2D import mix_model_PHM, mix_model_XJTU
-from model.resnet import resnet_101
+from model.resnet import resnet_101, resnet_34
 from model.LSTM import lstm_extracted_model, lstm_model
 from utils.tools import to_onehot, scaler_transform
 from tensorflow.keras.layers import Input
@@ -85,7 +85,7 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
   input_extracted = Input((14, 2), name='Extracted_LSTM_input')
   input_1D = Input((opt.input_shape, 2), name='LSTM_CNN1D_input')
   input_2D = Input((128, 128, 2), name='CNN_input')
-  RUL = mix_model_PHM(opt, lstm_model, resnet_101, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
+  RUL = mix_model_PHM(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
   network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=RUL)
 
   # get three types of different forms from original data-------------------------------
@@ -152,7 +152,7 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
   input_extracted = Input((14, 2), name='Extracted_LSTM_input')
   input_1D = Input((opt.input_shape, 2), name='LSTM_CNN1D_input')
   input_2D = Input((128, 128, 2), name='CNN_input')
-  Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_101, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
+  Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
   network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
 
   # get three types of different forms from original data-------------------------------
@@ -170,7 +170,7 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
   network.compile(optimizer=tf.keras.optimizers.RMSprop(1e-3),
                   loss=['categorical_crossentropy', tf.keras.losses.MeanSquaredLogarithmicError()], 
                   metrics=['acc', 'mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()], 
-                  loss_weights=[0.01, 1],
+                  loss_weights=[1, 1],
 #                   run_eagerly=True
                     ) # https://keras.io/api/losses/ 
   network.summary()

@@ -29,7 +29,6 @@ class ResNetTypeI(tf.keras.Model):
 
         self.avgpool = tf.keras.layers.GlobalAveragePooling2D()
         self.Dropout = Dropout(0.2)
-        self.fc = tf.keras.layers.Dense(units=opt.num_classes, activation=tf.keras.activations.softmax)
         
     def call(self, inputs, training=None, mask=None):
         x = self.conv1(inputs)
@@ -39,8 +38,7 @@ class ResNetTypeI(tf.keras.Model):
         x = self.layer2(x, training=training)
         x = self.layer3(x, training=training)
         x = self.layer4(x, training=training) 
-        x = self.avgpool(x)
-#         x = self.fc(x)
+        # x = self.avgpool(x)
         return x
 
 
