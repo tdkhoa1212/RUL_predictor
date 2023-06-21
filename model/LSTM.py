@@ -97,7 +97,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block, training):
               activity_regularizer=regularizers.l2(1e-5),
               name=conv_name_base + '2a')(x)
 
-    x = BatchNormalization(name=bn_name_base + '2a')(x, training=training)
+    x = BatchNormalization(name=bn_name_base + '2b')(x, training=training)
     x = Activation('relu')(x)
     x = Dropout(0.2)(x, training=training) 
     x = Conv1D(filters,
@@ -157,25 +157,25 @@ def lstm_model(opt, training=None, inputs=None):
   return m
 
 def lstm_extracted_model(opt, training=None, inputs=None):
-  x = Conv1D(28,
-               kernel_size=4,
-               strides=1,
-               padding='same',
-               kernel_initializer='glorot_uniform',
-               kernel_regularizer=regularizers.l2(l=0.0001))(inputs)
-  x = BatchNormalization()(x, training=training)
-  x = Activation('relu')(x)
-  x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
+  # x = Conv1D(28,
+  #              kernel_size=4,
+  #              strides=1,
+  #              padding='same',
+  #              kernel_initializer='glorot_uniform',
+  #              kernel_regularizer=regularizers.l2(l=0.0001))(inputs)
+  # x = BatchNormalization()(x, training=training)
+  # x = Activation('relu')(x)
+  # x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
 
-  x = Conv1D(56,
-               kernel_size=2,
-               strides=1,
-               padding='same',
-               kernel_initializer='glorot_uniform',
-               kernel_regularizer=regularizers.l2(l=0.0001))(x)
-  x = BatchNormalization()(x, training=training)
-  x = Activation('relu')(x)
-  x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
+  # x = Conv1D(56,
+  #              kernel_size=2,
+  #              strides=1,
+  #              padding='same',
+  #              kernel_initializer='glorot_uniform',
+  #              kernel_regularizer=regularizers.l2(l=0.0001))(x)
+  # x = BatchNormalization()(x, training=training)
+  # x = Activation('relu')(x)
+  # x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
 
   # -----------------------------------------------------------------------------
 
@@ -187,11 +187,9 @@ def lstm_extracted_model(opt, training=None, inputs=None):
                strides=1,
                padding='same',
                kernel_initializer='glorot_uniform',
-               kernel_regularizer=regularizers.l2(l=0.0001))(x) + inputs
-  
-  xCenter = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
-
-  x = BatchNormalization()(xCenter, training=training)
+               kernel_regularizer=regularizers.l2(l=0.0001))(x) 
+  x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
+  x = BatchNormalization()(x, training=training)
   x = Activation('relu')(x)
   x = Dropout(0.2)(x, training=training)
   x = Conv1D(56,
@@ -199,7 +197,6 @@ def lstm_extracted_model(opt, training=None, inputs=None):
                strides=1,
                padding='same',
                kernel_initializer='glorot_uniform',
-               kernel_regularizer=regularizers.l2(l=0.0001))(x) + xCenter
-  
+               kernel_regularizer=regularizers.l2(l=0.0001))(x) 
   x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
   return x
