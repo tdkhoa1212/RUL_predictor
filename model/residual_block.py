@@ -29,13 +29,20 @@ class BasicBlock(tf.keras.layers.Layer):
     def call(self, inputs, training=None, **kwargs):
         residual = self.downsample(inputs)
 
-        x = self.conv1(inputs)
-        x = self.bn1(x, training=training)
+        # x = self.conv1(inputs)
+        # x = self.bn1(x, training=training)
+        # x = tf.nn.relu(x)
+        # x = self.conv2(x)
+        # x = self.bn2(x, training=training)
+
+        x = self.bn1(inputs, training=training)
         x = tf.nn.relu(x)
-#         x = self.dropout(0.1)(x)
-        x = self.conv2(x)
+        x = self.dropout(0.2)(x)
+        x = self.conv1(x)
         x = self.bn2(x, training=training)
-#         x = self.dropout(0.1)(x)
+        x = tf.nn.relu(x)
+        x = self.dropout(0.2)(x)
+        x = self.conv2(x)
 
         output = tf.nn.relu(tf.keras.layers.add([residual, x]))
 
