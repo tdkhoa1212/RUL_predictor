@@ -24,7 +24,7 @@ class BasicBlock(tf.keras.layers.Layer):
             self.downsample.add(tf.keras.layers.BatchNormalization())
         else:
             self.downsample = lambda x: x
-        self.dropout = tf.keras.layers.Dropout(0.1)
+        self.dropout = tf.keras.layers.Dropout(0.2)
         
     def call(self, inputs, training=None, **kwargs):
         residual = self.downsample(inputs)
@@ -37,11 +37,11 @@ class BasicBlock(tf.keras.layers.Layer):
 
         x = self.bn1(inputs, training=training)
         x = tf.nn.relu(x)
-        x = self.dropout(0.2)(x)
+        x = self.dropout(x)
         x = self.conv1(x)
         x = self.bn2(x, training=training)
         x = tf.nn.relu(x)
-        x = self.dropout(0.2)(x)
+        x = self.dropout(x)
         x = self.conv2(x)
 
         output = tf.nn.relu(tf.keras.layers.add([residual, x]))
