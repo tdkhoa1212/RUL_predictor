@@ -40,7 +40,7 @@ def parse_opt(known=False):
     parser.add_argument('--condition',      default='c_all', type=str, help='c_1, c_2, c_3, c_all')
     parser.add_argument('--type',           default='PHM', type=str, help='PHM, XJTU')
     parser.add_argument('--case',           default='case2', type=str, help='case1, case2')
-    parser.add_argument('--scaler',         default=None, type=str)
+    parser.add_argument('--scaler',         default='PowerTransformer', type=str)
     parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data_new/data', type=str)
 
     parser.add_argument('--epochs',         default=20, type=int)

@@ -103,7 +103,6 @@ def main(opt):
     if opt.type == 'PHM' and opt.case == 'case1':
       t_label_RUL = test_label_RUL[num: num+test_idx[name]]
       num += test_idx[name]
-      print(RUL)
       r2, mae_, mse_ = all_matric_PHM(t_label_RUL, RUL)
     else:
       Condition = back_onehot(Condition)
