@@ -10,22 +10,12 @@ from tensorflow_addons.layers import MultiHeadAttention
 
 
 def TransformerLayer(x, c, num_heads=16, training=None):
-    x1 = tf.keras.layers.Dense(c,   activation='relu',
+    x = tf.keras.layers.Dense(c,   activation='relu',
                                      kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
                                      bias_regularizer=regularizers.l2(1e-4),
                                      activity_regularizer=regularizers.l2(1e-5))(x)
-    x1 = Dropout(0.2)(x1, training=training)
-    x2 = tf.keras.layers.Dense(c,   activation='relu',
-                                     kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
-                                     bias_regularizer=regularizers.l2(1e-4),
-                                     activity_regularizer=regularizers.l2(1e-5))(x)
-    x2 = Dropout(0.2)(x2, training=training)
-    x3 = tf.keras.layers.Dense(c,   activation='relu',
-                                     kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
-                                     bias_regularizer=regularizers.l2(1e-4),
-                                     activity_regularizer=regularizers.l2(1e-5))(x)
-    x3 = Dropout(0.2)(x3, training=training)
-    ma  = MultiHeadAttention(head_size=num_heads, num_heads=num_heads)([x1, x2, x3]) 
+    x = Dropout(0.2)(x, training=training)
+    ma  = MultiHeadAttention(head_size=num_heads, num_heads=num_heads)([x, x, x]) 
     ma = tf.keras.layers.Dense(c,   activation='relu',
                                      kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
                                      bias_regularizer=regularizers.l2(1e-4),
