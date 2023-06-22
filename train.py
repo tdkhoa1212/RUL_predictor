@@ -40,7 +40,7 @@ def parse_opt(known=False):
     parser.add_argument('--condition',      default='c_all', type=str, help='c_1, c_2, c_3, c_all')
     parser.add_argument('--type',           default='PHM', type=str, help='PHM, XJTU')
     parser.add_argument('--case',           default='case2', type=str, help='case1, case2')
-    parser.add_argument('--scaler',         default='PowerTransformer', type=str, help='PowerTransformer')
+    parser.add_argument('--scaler',         default=None, type=str, help='PowerTransformer')
     parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data_new/data', type=str)
 
     parser.add_argument('--epochs',         default=100, type=int)
@@ -51,7 +51,7 @@ def parse_opt(known=False):
     parser.add_argument('--predict_time', default=False, type=bool)
     parser.add_argument('--mix_model',    default=True,  type=bool)
     parser.add_argument('--encoder',      default=False, type=bool)
-    parser.add_argument('--load_weight',  default=True, type=bool)  
+    parser.add_argument('--load_weight',  default=False, type=bool)  
     
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
@@ -79,7 +79,7 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
     test_1D = scaler_transform(test_1D, scaler)
     test_extract = scaler_transform(test_extract, scaler)
   
-  val_2D, val_1D, val_extract, val_label_RUL = test_2D, test_1D, test_extract, test_label_RUL
+  val_2D, val_1D, val_extract, val_label_RUL = test_2D[:100], test_1D[:100], test_extract[:100], test_label_RUL[:100]
   val_data = [val_1D, val_2D, val_extract]
 
   input_extracted = Input((14, 2), name='Extracted_LSTM_input')
@@ -145,7 +145,7 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
   train_label_Con = to_onehot(train_label_Con)
   test_label_Con  = to_onehot(test_label_Con)
 
-  val_2D, val_1D, val_extract, val_label_Con, val_label_RUL = test_2D, test_1D, test_extract, test_label_Con, test_label_RUL
+  val_2D, val_1D, val_extract, val_label_Con, val_label_RUL = test_2D[:100], test_1D[:100], test_extract[:100], test_label_Con[:100], test_label_RUL[:100]
   val_data = [val_1D, val_2D, val_extract]
   val_label = [val_label_Con, val_label_RUL]
 
