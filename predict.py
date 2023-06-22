@@ -2,7 +2,7 @@ from train import parse_opt
 from model.resnet import resnet_101, resnet_34
 from model.LSTM import lstm_extracted_model, lstm_model
 from model.MIX_1D_2D import mix_model_PHM, mix_model_XJTU
-from utils.tools import all_matric_XJTU, all_matric_PHM, back_onehot
+from utils.tools import all_matric_XJTU, all_matric_PHM, back_onehot, scaler_transform
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from model.autoencoder import autoencoder_model
