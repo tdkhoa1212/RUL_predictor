@@ -37,7 +37,7 @@ if opt.case == 'case1':
       train_EC(train_1D * train_1D_filter, 'XJTU', opt)
 
   # Saving the converted data ==================================================================================
-  if os.path.exists(join(saved_dir, 'Bearing1_4_data_1d.npy')) == False:
+  if os.path.exists(join(saved_dir, 'Bearing1_4_data_1d.npy')) == False or opt.encoder == True:
     for type_data in opt.data_type:
       # Train data-------------------------------------------------------------------------
       Bearing1_1_path = join(main_dir_colab, '35Hz12kN', 'Bearing1_1')
@@ -161,7 +161,7 @@ else:
     train_EC(train_1D*train_1D_filter, 'XJTU', EC_XJTU_path, opt)
 
   # Saving the converted data ==================================================================================
-  if os.path.exists(join(saved_dir, 'Bearing1_4_data_1d.npy')) == False:
+  if os.path.exists(join(saved_dir, 'Bearing1_4_data_1d.npy')) == False or opt.encoder == True:
     for type_data in opt.data_type:
       # Train data-------------------------------------------------------------------------
       Bearing1_1_path = join(main_dir_colab, '35Hz12kN', 'Bearing1_1')

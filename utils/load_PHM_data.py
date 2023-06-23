@@ -103,7 +103,7 @@ else:
       train_EC(train_1D*train_1D_filter, 'PHM', EC_PHM_path, opt)
 
 
-  if exists(join(saved_dir, 'Bearing2_1_data_1d.npy')) == False:
+  if exists(join(saved_dir, 'Bearing2_1_data_1d.npy')) == False or opt.encoder == True:
     for type_data in opt.data_type:
       # Converting data-------------------------------------------------------------------------
       print(f'\n Saving data in {opt.type} data set'+'-'*100)
