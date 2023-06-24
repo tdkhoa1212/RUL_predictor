@@ -25,11 +25,10 @@ def autoencoder_model(type_):
     x = Conv1D(filters=32, kernel_size=7, padding="same", strides=2, activation="relu")(inputs)
     x = Dropout(rate=0.2)(x)
     x = Conv1D(filters=16, kernel_size=7, padding="same", strides=2, activation="relu")(x)
-    x = Conv1DTranspose(filters=16, kernel_size=7, padding="same", strides=2, activation="relu")(x)
+    x = Conv1DTranspose(filters=16, kernel_size=7, padding="same", strides=1, activation="relu")(x)
     x = Dropout(rate=0.2)(x)
     x = Conv1DTranspose(filters=32, kernel_size=7, padding="same", strides=2, activation="relu")(x)
-    x = Conv1DTranspose(filters=1, kernel_size=7, padding="same", activation="relu")(x)
-    output = TimeDistributed(Dense(x2))(L5)
+    output = TimeDistributed(Dense(x2))(x)
 
     model = Model(inputs=inputs, outputs=output)
     return model
