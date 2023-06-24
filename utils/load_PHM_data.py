@@ -26,14 +26,13 @@ if opt.case == 'case1':
   # Train for encoder model ==================================================================================
   if opt.encoder:
     EC_PHM_path = join(opt.save_dir, 'PHM.h5')
-    if exists(EC_PHM_path) == False:
-      # Load saved bearing data ==================================================================================
-      test_1D, test_2D, test_extract, test_label_RUL = getting_data(saved_dir, opt.test_bearing, opt)
-      train_1D, train_2D, train_extract, train_label_RUL = getting_data(saved_dir, opt.train_bearing, opt)
-      s_0, s_1, s_2 = train_1D.shape
-      train_1D = train_1D.reshape((s_0, s_2, s_1))
-      train_1D_filter = np.where(train_1D>0, 1, -1)
-      train_EC(train_1D*train_1D_filter, 'PHM', EC_PHM_path, opt)
+    # Load saved bearing data ==================================================================================
+    test_1D, test_2D, test_extract, test_label_RUL = getting_data(saved_dir, opt.test_bearing, opt)
+    train_1D, train_2D, train_extract, train_label_RUL = getting_data(saved_dir, opt.train_bearing, opt)
+    s_0, s_1, s_2 = train_1D.shape
+    train_1D = train_1D.reshape((s_0, s_2, s_1))
+    train_1D_filter = np.where(train_1D>0, 1, -1)
+    train_EC(train_1D*train_1D_filter, 'PHM', EC_PHM_path, opt)
 
 
   if exists(join(saved_dir, 'Bearing2_1_data_1d.npy')) == False:
