@@ -261,7 +261,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
     
     num_files = len([i for i in os.listdir(name_bearing)])
     if type_ == 'PHM':
-      if opt.encoder:
+      if opt.encoder_train:
         model = autoencoder_model(type_)
         EC_PHM_path = join(opt.save_dir, f'{type_}.h5')
         model.load_weights(EC_PHM_path)
@@ -274,7 +274,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_v = extract_feature_image(df, opt, type_data, feature_name='vert accel', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
               if type_data=='1d' or type_data=='extract':
-                if opt.encoder:
+                if opt.encoder_train:
                     x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
                     raw_signal_filter = np.where(x_>0, 1, -1)
                     x_ = raw_signal_filter * model.predict(x_*raw_signal_filter, verbose = 0, batch_size = 32)
@@ -287,7 +287,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               data['x'].append(x_)
               data['y'].append(y_)
     else:
-      if opt.encoder:
+      if opt.encoder_train:
         print('\n' + '#'*10 + 'USING ENCODE' + '\n' + '#'*10)
         model = autoencoder_model(type_)
         EC_XJTU_path = join(opt.save_dir, f'{type_}.h5')
@@ -301,7 +301,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_v = extract_feature_image(df, opt, type_data, feature_name='Vertical_vibration_signals', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
               if type_data=='1d' or type_data=='extract':
-                if opt.encoder:
+                if opt.encoder_train:
                     x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
                     raw_signal_filter = np.where(x_>0, 1, -1)
                     x_ = raw_signal_filter * model.predict(x_*raw_signal_filter, verbose = 0, batch_size = 32)
