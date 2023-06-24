@@ -169,7 +169,7 @@ def lstm_extracted_model(opt, training=None, inputs=None):
                strides=1,
                padding='same',
                kernel_initializer='glorot_uniform',
-               kernel_regularizer=regularizers.l2(l=0.0001))(x) 
+               kernel_regularizer=regularizers.l2(l=0.0001))(inputs) 
   x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
   x = BatchNormalization()(x, training=training)
   x = Activation('relu')(x)
