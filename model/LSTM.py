@@ -164,10 +164,6 @@ def lstm_extracted_model(opt, training=None, inputs=None):
   # x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
 
   # -----------------------------------------------------------------------------
-
-  x = BatchNormalization()(inputs, training=training)
-  x = Activation('relu')(x)
-  x = Dropout(0.2)(x, training=training)
   x = Conv1D(28,
                kernel_size=4,
                strides=1,
