@@ -12,12 +12,14 @@ def autoencoder_model(type_):
       x1 = 2
       x2 = 32768
     L1 = LSTM(512, return_sequences=True, activation="relu")(inputs)
-    L1 = Dropout(0.2)(L1)
+    L1 = Dropout(0.1)(L1)
     L2 = LSTM(64, return_sequences=False, activation="relu")(L1)
+    L2 = Dropout(0.1)(L2)
     L3 = RepeatVector(x1)(L2)
     L4 = LSTM(64, return_sequences=True, activation="relu")(L3)
+    L4 = Dropout(0.1)(L4)
     L5 = LSTM(512, return_sequences=True, activation="relu")(L4)
-    L5 = Dropout(0.2)(L5)
+    L5 = Dropout(0.1)(L5)
     output = TimeDistributed(Dense(x2, activation="relu"))(L5)    
 
     # x = Conv1D(filters=32, kernel_size=7, padding="same", strides=2, activation="relu")(inputs)
