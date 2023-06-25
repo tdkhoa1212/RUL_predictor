@@ -337,6 +337,9 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
       print(f'Original shape of {nameB} data: {shapeB}')
       t_data = data['x'][time: ]
       data['x'] = t_data
+    else:
+      if type_data == '1d':
+        data['y'] = convert_1_to_0(np.array(data['y']))
         
     ############## 1D-data to extraction data #####################
     if type_data=='extract':
