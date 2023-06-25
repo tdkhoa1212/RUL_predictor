@@ -5,6 +5,7 @@ import pandas as pd
 import pickle as pkl
 from numpy import save
 from numpy import load
+from sklearn.decomposition import PCA
 import pywt
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
@@ -245,6 +246,11 @@ def denoise(signals):
         # all_signal.append(nr.reduce_noise(y=x, sr=2559, hop_length=20, time_constant_s=0.1, prop_decrease=0.5, freq_mask_smooth_hz=25600))
     return np.expand_dims(all_signal, axis=-1)
 
+def compute_PCA(x):
+  pca = PCA(n_components=1)
+  pca.fit(x)
+  return pca.singular_values_[0]
+
 def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
     '''
     This function is to get data and label from FPT points to later
@@ -273,6 +279,8 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_h = extract_feature_image(df, opt, type_data, feature_name='horiz accel', type_=type_)
               coef_v = extract_feature_image(df, opt, type_data, feature_name='vert accel', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
+              if type_data == '1d' and opt.PCAlabel == True:
+                data['y'].append(compute_PCA(x_))
               if type_data=='1d' or type_data=='extract':
                 if opt.encoder_train:
                     x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
@@ -283,9 +291,10 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
                 x_ = x_.tolist()
               else:
                 x_ = x_.tolist()
-              y_ = gen_rms(coef_h)
+              if opt.PCAlabel == False:
+                y_ = gen_rms(coef_h)
+                data['y'].append(y_)
               data['x'].append(x_)
-              data['y'].append(y_)
     else:
       if opt.encoder_train:
         print('\n' + '#'*10 + 'USING ENCODE' + '\n' + '#'*10)
@@ -300,6 +309,8 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_h = extract_feature_image(df, opt, type_data, feature_name='Horizontal_vibration_signals', type_=type_)
               coef_v = extract_feature_image(df, opt, type_data, feature_name='Vertical_vibration_signals', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
+              if type_data == '1d' and opt.PCAlabel == True:
+                data['y'].append(compute_PCA(x_))
               if type_data=='1d' or type_data=='extract':
                 if opt.encoder_train:
                     x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
@@ -310,23 +321,21 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
                 x_ = x_.tolist()
               else:
                 x_ = x_.tolist()
-              y_ = gen_rms(coef_h)
+              if opt.PCAlabel == False:
+                y_ = gen_rms(coef_h)
+                data['y'].append(y_)
               data['x'].append(x_)
-              data['y'].append(y_)
     
     data['x'] = np.array(data['x'])
     data['y'] = np.array(data['y'])
     
     ################ Create linear label based on FPT points #########################
-   
-    t_label = np.linspace(1, 0, len(data['y'][time: ]))
-    data['y'] = t_label
-
-    Shape_o = data['x'].shape
-    name_b = name_bearing.split('/')[-1]
-    print(f'Original shape of {name_b} data: {Shape_o}')
-    t_data = data['x'][time: ]
-    data['x'] = t_data
+    if opt.PCAlabel == False:
+      t_label = np.linspace(1, 0, len(data['y'][time: ]))
+      data['y'] = t_label
+      print(f'Original shape of {name_bearing.split('/')[-1]} data: {data['x'].shape}')
+      t_data = data['x'][time: ]
+      data['x'] = t_data
         
     ############## 1D-data to extraction data #####################
     if type_data=='extract':
