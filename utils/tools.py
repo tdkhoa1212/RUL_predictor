@@ -333,7 +333,8 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
     if opt.PCAlabel == False:
       t_label = np.linspace(1, 0, len(data['y'][time: ]))
       data['y'] = t_label
-      print(f'Original shape of {name_bearing.split('/')[-1]} data: {data['x'].shape}')
+      nameB, shapeB = name_bearing.split('/')[-1], data['x'].shape
+      print(f'Original shape of {nameB} data: {shapeB}')
       t_data = data['x'][time: ]
       data['x'] = t_data
         
