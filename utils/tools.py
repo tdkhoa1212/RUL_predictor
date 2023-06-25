@@ -208,6 +208,17 @@ def scaler_transform(signals, scale_method):
 
 def extract_feature_image(df, opt, type_data, feature_name='horiz accel', type_=None):
     WAVELET_TYPE = 'morl'
+    if opt.encoder_train:
+      model = autoencoder_model(type_)
+      EC_PHM_path = join(opt.save_dir, f'{type_}.h5')
+      model.load_weights(EC_PHM_path)
+
+      x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
+      raw_signal_filter = np.where(x_>0, 1, -1)
+      x_ = raw_signal_filter * model.predict(x_*raw_signal_filter, verbose = 0, batch_size = 32)
+      x_ = np.squeeze(x_)
+      x_ = x_.reshape(x_.shape[1], x_.shape[0])
+
     if type_ == 'PHM':
       DATA_POINTS_PER_FILE=2560
       if feature_name == 'horiz accel':
@@ -267,10 +278,6 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
     
     num_files = len([i for i in os.listdir(name_bearing)])
     if type_ == 'PHM':
-      if opt.encoder_train:
-        model = autoencoder_model(type_)
-        EC_PHM_path = join(opt.save_dir, f'{type_}.h5')
-        model.load_weights(EC_PHM_path)
       for i in range(num_files):
           name = f"acc_{str(i+1).zfill(5)}.csv"
           file_ = join(name_bearing, name)
@@ -279,21 +286,11 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_h = extract_feature_image(df, opt, type_data, feature_name='horiz accel', type_=type_)
               coef_v = extract_feature_image(df, opt, type_data, feature_name='vert accel', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
+
               if type_data == '1d' and opt.PCAlabel == True:
                 data['y'].append(compute_PCA(x_))
-              if type_data=='1d' or type_data=='extract':
-                if opt.encoder_train:
-                    x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
-                    raw_signal_filter = np.where(x_>0, 1, -1)
-                    x_ = raw_signal_filter * model.predict(x_*raw_signal_filter, verbose = 0, batch_size = 32)
-                    x_ = np.squeeze(x_)
-                    x_ = x_.reshape(x_.shape[1], x_.shape[0])
-                x_ = x_.tolist()
-              else:
-                x_ = x_.tolist()
-              if opt.PCAlabel == False:
-                y_ = gen_rms(coef_h)
-                data['y'].append(y_)
+
+              x_ = x_.tolist()
               data['x'].append(x_)
     else:
       if opt.encoder_train:
@@ -309,29 +306,18 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_h = extract_feature_image(df, opt, type_data, feature_name='Horizontal_vibration_signals', type_=type_)
               coef_v = extract_feature_image(df, opt, type_data, feature_name='Vertical_vibration_signals', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
+
               if type_data == '1d' and opt.PCAlabel == True:
                 data['y'].append(compute_PCA(x_))
-              if type_data=='1d' or type_data=='extract':
-                if opt.encoder_train:
-                    x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
-                    raw_signal_filter = np.where(x_>0, 1, -1)
-                    x_ = raw_signal_filter * model.predict(x_*raw_signal_filter, verbose = 0, batch_size = 32)
-                    x_ = np.squeeze(x_)
-                    x_ = x_.reshape(x_.shape[1], x_.shape[0])
-                x_ = x_.tolist()
-              else:
-                x_ = x_.tolist()
-              if opt.PCAlabel == False:
-                y_ = gen_rms(coef_h)
-                data['y'].append(y_)
+                
+              x_ = x_.tolist()
               data['x'].append(x_)
     
     data['x'] = np.array(data['x'])
-    data['y'] = np.array(data['y'])
     
     ################ Create linear label based on FPT points #########################
     if opt.PCAlabel == False:
-      t_label = np.linspace(1, 0, len(data['y'][time: ]))
+      t_label = np.linspace(1, 0, len(data['x'][time: ]))
       data['y'] = t_label
       nameB, shapeB = name_bearing.split('/')[-1], data['x'].shape
       print(f'Original shape of {nameB} data: {shapeB}')
