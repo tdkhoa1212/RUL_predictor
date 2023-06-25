@@ -374,7 +374,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
     #     data['y'], _ = fit_values(2.31e-5, 0.99, 1.10, 1.68e-93, 28.58, np.array(data['y']))
 
     x_shape = data['x'].shape
-    y_shape = data['y'].shape
+    y_shape = np.array(data['y']).shape
     print(f'Train data shape: {x_shape}   Train label shape: {y_shape}\n')
     return data
 
@@ -431,11 +431,12 @@ def fit_values(k, b, Y, M, B, rrms):  # fit_values(2.31e-5, 0.99, 1.10, 1.68e-93
 def gen_rms(col):
     return np.squeeze(np.sqrt(np.mean(col**2)))
 
-def convert_1_to_0(data):
+def convert_1_to_0(data, _1_to_0=False):
     if np.min(data) != np.max(data):
       f_data = (data - np.min(data))/(np.max(data) - np.min(data))
     else:
       f_data = np.ones_like(data)
+    f_data = 1-f_data if _1_to_0 else f_data
     return 1-f_data
 
 def predict_time_2(data, length_seg=None):
