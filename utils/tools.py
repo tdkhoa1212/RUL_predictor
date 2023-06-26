@@ -213,11 +213,11 @@ def extract_feature_image(df, opt, type_data, feature_name='horiz accel', type_=
       EC_PHM_path = join(opt.save_dir, f'{type_}.h5')
       model.load_weights(EC_PHM_path)
 
-      x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
-      raw_signal_filter = np.where(x_>0, 1, -1)
-      x_ = raw_signal_filter * model.predict(x_*raw_signal_filter, verbose = 0, batch_size = 32)
-      x_ = np.squeeze(x_)
-      x_ = x_.reshape(x_.shape[1], x_.shape[0])
+      df = np.expand_dims(df.reshape(df.shape[1], df.shape[0]), axis=0)
+      raw_signal_filter = np.where(df>0, 1, -1)
+      df = raw_signal_filter * model.predict(df*raw_signal_filter, verbose = 0, batch_size = 32)
+      df = np.squeeze(df)
+      df = df.reshape(df.shape[1], df.shape[0])
 
     if type_ == 'PHM':
       DATA_POINTS_PER_FILE=2560
