@@ -208,10 +208,6 @@ def scaler_transform(signals, scale_method):
 
 def extract_feature_image(df, opt, type_data, feature_name='horiz accel', type_=None):
     WAVELET_TYPE = 'morl'
-    if opt.encoder_train:
-      model = autoencoder_model(type_)
-      EC_PHM_path = join(opt.save_dir, f'{type_}.h5')
-      model.load_weights(EC_PHM_path)
 
     if type_ == 'PHM':
       DATA_POINTS_PER_FILE=2560
@@ -271,6 +267,11 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
       print('-'*10, f'Maintain 1D data', '-'*10, '\n')
     
     num_files = len([i for i in os.listdir(name_bearing)])
+    if opt.encoder_train and type_data != '2d':
+      model = autoencoder_model(type_)
+      EC_PHM_path = join(opt.save_dir, f'{type_}.h5')
+      model.load_weights(EC_PHM_path)
+      
     if type_ == 'PHM':
       for i in range(num_files):
           name = f"acc_{str(i+1).zfill(5)}.csv"
@@ -281,7 +282,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_v = extract_feature_image(df, opt, type_data, feature_name='vert accel', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
 
-              if type_data != '2d':
+              if opt.encoder_train and type_data != '2d':
                 x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
                 raw_signal_filter = np.where(x_>0, 1, -1)
                 x_ = raw_signal_filter * model.predict(x_*raw_signal_filter, verbose = 0, batch_size = 32)
@@ -308,13 +309,13 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_v = extract_feature_image(df, opt, type_data, feature_name='Vertical_vibration_signals', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
 
-              if type_data != '2d':
+              if opt.encoder_train and type_data != '2d':
                 x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
                 raw_signal_filter = np.where(x_>0, 1, -1)
                 x_ = raw_signal_filter * model.predict(x_*raw_signal_filter, verbose = 0, batch_size = 32)
                 x_ = np.squeeze(x_)
                 x_ = x_.reshape(x_.shape[1], x_.shape[0])
-                
+
               if type_data == '1d' and opt.PCAlabel == True:
                 data['y'].append(compute_PCA(x_))
                 
