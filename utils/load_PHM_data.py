@@ -24,7 +24,7 @@ if opt.case == 'case1':
         'Bearing1_7': 2210}
 
   # Train for encoder model ==================================================================================
-  if opt.encoder_train:
+  if (opt.encoder_train) and opt.predict == False:
     EC_PHM_path = join(opt.save_dir, 'PHM.h5')
     # Load saved bearing data ==================================================================================
     test_1D, test_2D, test_extract, test_label_RUL = getting_data(saved_dir, opt.test_bearing, opt)
@@ -35,7 +35,7 @@ if opt.case == 'case1':
     train_EC(train_1D*train_1D_filter, 'PHM', EC_PHM_path, opt)
 
 
-  if exists(join(saved_dir, 'Bearing2_1_data_1d.npy')) == False or opt.encoder_train == True:
+  if (exists(join(saved_dir, 'Bearing2_1_data_1d.npy')) == False or opt.encoder_train == True ) and opt.predict == False:
     for type_data in opt.data_type:
       # Converting data-------------------------------------------------------------------------
       print(f'\n Saving data in {opt.type} data set'+'-'*100)
@@ -98,7 +98,7 @@ else:
         'Bearing3_3': 82}
 
   # Train for encoder model ==================================================================================
-  if opt.encoder_train:
+  if (opt.encoder_train) and opt.predict == False:
     EC_PHM_path = join(opt.save_dir, 'PHM.h5')
     # Load saved bearing data ==================================================================================
     train_1D, train_2D, train_extract, train_label_RUL, train_label_Con = getting_data(saved_dir, opt.train_bearing, opt)
@@ -108,7 +108,7 @@ else:
     train_EC(train_1D*train_1D_filter, 'PHM', EC_PHM_path, opt)
 
 
-  if exists(join(saved_dir, 'Bearing2_1_data_1d.npy')) == False or opt.encoder_train == True:
+  if (exists(join(saved_dir, 'Bearing2_1_data_1d.npy')) == False or opt.encoder_train == True) and opt.predict == False:
     for type_data in opt.data_type:
       # Converting data-------------------------------------------------------------------------
       print(f'\n Saving data in {opt.type} data set'+'-'*100)

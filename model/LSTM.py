@@ -143,26 +143,6 @@ def lstm_model(opt, training=None, inputs=None):
   return m
 
 def lstm_extracted_model(opt, training=None, inputs=None):
-  # x = Conv1D(28,
-  #              kernel_size=4,
-  #              strides=1,
-  #              padding='same',
-  #              kernel_initializer='glorot_uniform',
-  #              kernel_regularizer=regularizers.l2(l=0.0001))(inputs)
-  # x = BatchNormalization()(x, training=training)
-  # x = Activation('relu')(x)
-  # x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
-
-  # x = Conv1D(56,
-  #              kernel_size=2,
-  #              strides=1,
-  #              padding='same',
-  #              kernel_initializer='glorot_uniform',
-  #              kernel_regularizer=regularizers.l2(l=0.0001))(x)
-  # x = BatchNormalization()(x, training=training)
-  # x = Activation('relu')(x)
-  # x = AveragePooling1D(pool_size=2, strides=None, padding='valid')(x)
-
   # -----------------------------------------------------------------------------
   x = Conv1D(28,
                kernel_size=4,
