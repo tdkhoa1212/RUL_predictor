@@ -282,15 +282,15 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_v = extract_feature_image(df, opt, type_data, feature_name='vert accel', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
 
+              if type_data == '1d' and opt.PCAlabel == True:
+                data['y'].append(compute_PCA(x_))
+
               if opt.encoder_train and type_data != '2d':
                 x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
                 raw_signal_filter = np.where(x_>0, 1, -1)
                 x_ = raw_signal_filter * model.predict(x_*raw_signal_filter, verbose = 0, batch_size = 32)
                 x_ = np.squeeze(x_)
                 x_ = x_.reshape(x_.shape[1], x_.shape[0])
-
-              if type_data == '1d' and opt.PCAlabel == True:
-                data['y'].append(compute_PCA(x_))
 
               x_ = x_.tolist()
               data['x'].append(x_)
@@ -309,6 +309,9 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               coef_v = extract_feature_image(df, opt, type_data, feature_name='Vertical_vibration_signals', type_=type_)
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
 
+              if type_data == '1d' and opt.PCAlabel == True:
+                data['y'].append(compute_PCA(x_))
+
               if opt.encoder_train and type_data != '2d':
                 x_ = np.expand_dims(x_.reshape(x_.shape[1], x_.shape[0]), axis=0)
                 raw_signal_filter = np.where(x_>0, 1, -1)
@@ -316,9 +319,6 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
                 x_ = np.squeeze(x_)
                 x_ = x_.reshape(x_.shape[1], x_.shape[0])
 
-              if type_data == '1d' and opt.PCAlabel == True:
-                data['y'].append(compute_PCA(x_))
-                
               x_ = x_.tolist()
               data['x'].append(x_)
     
