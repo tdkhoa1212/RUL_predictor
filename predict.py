@@ -39,7 +39,7 @@ elif opt.type == 'PHM' and opt.case == 'case2':
   from utils.load_PHM_data import test_1D, test_2D, test_extract, test_label_Con, test_label_RUL, test_idx
 else:
   from utils.load_XJTU_data import train_1D, train_2D, train_extract, train_label_Con, train_label_RUL,\
-                                     test_1D, test_2D, test_extract, test_label_Con, test_label_RUL
+                                     test_1D, test_2D, test_extract, test_label_Con, test_label_RUL, test_idx
 
 def Predict(data, opt):
   # Loading model ############################################################
