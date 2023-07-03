@@ -10,8 +10,8 @@ def train_EC(train_data, type_, weights, opt):
     model.compile(optimizer=tf.keras.optimizers.Adam(1e-3),
                   loss=tf.keras.losses.MeanSquaredError(reduction=tf.keras.losses.Reduction.NONE))
     
-    # if exists(weights):
-    #   model.load_weights(weights)
+    if exists(weights):
+      model.load_weights(weights)
     model.fit(train_data, train_data,
                 epochs=opt.EC_epochs,
                 shuffle=True,

@@ -30,47 +30,6 @@ def identity_block(input_tensor, kernel_size, filters, stage, block, training):
     conv_name_base = 'res' + str(stage) + str(block) + '_branch'
     bn_name_base = 'bn' + str(stage) + str(block) + '_branch'
 
-    #--------------------------------------------------------------------------------
-
-    # x = Conv1D(filters,
-    #            kernel_size=kernel_size,
-    #            strides=1,
-    #            padding='same',
-    #           kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
-    #           bias_regularizer=regularizers.l2(1e-4),
-    #           activity_regularizer=regularizers.l2(1e-5),
-    #           name=conv_name_base + '2a')(input_tensor)
-    # x = BatchNormalization(name=bn_name_base + '2a')(x, training=training)
-    # x = Activation('relu')(x)
-
-    # x = Conv1D(filters,
-    #            kernel_size=kernel_size,
-    #            strides=1,
-    #            padding='same',
-    #           kernel_regularizer=regularizers.l1_l2(l1=1e-5, l2=1e-4),
-    #           bias_regularizer=regularizers.l2(1e-4),
-    #           activity_regularizer=regularizers.l2(1e-5),
-    #           name=conv_name_base + '2b')(x)
-    # x = BatchNormalization(name=bn_name_base + '2b')(x, training=training)
-
-    # if input_tensor.shape[2] != x.shape[2]:
-    #     x = layers.add([x, Lambda(lambda y: K.repeat_elements(y, rep=2, axis=2))(input_tensor)])
-    # else:
-    #     x = layers.add([x, input_tensor])
-
-    # x = BatchNormalization()(x, training=training)
-    # x = Activation('relu')(x)
-
-    # if input_tensor.shape[2] != x.shape[2]:
-    #     x = layers.add([x, Lambda(lambda y: K.repeat_elements(y, rep=2, axis=2))(input_tensor)])
-    # else:
-    #     x = layers.add([x, input_tensor])
-
-    # x = BatchNormalization()(x, training=training)
-    # x = Activation('relu')(x)
-  
-    #------------------------------------------------------------------
-
     x = BatchNormalization(name=bn_name_base + '2a')(input_tensor, training=training)
     x = Activation('relu')(x)
     x = Dropout(0.2)(x, training=training)
@@ -143,7 +102,6 @@ def lstm_model(opt, training=None, inputs=None):
   return m
 
 def lstm_extracted_model(opt, training=None, inputs=None):
-  # -----------------------------------------------------------------------------
   x = Conv1D(28,
                kernel_size=4,
                strides=1,
