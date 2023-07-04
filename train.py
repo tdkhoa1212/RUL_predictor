@@ -52,8 +52,8 @@ def parse_opt(known=False):
     parser.add_argument('--predict',      default=False, type=bool)
     parser.add_argument('--mix_model',    default=True,  type=bool)
     parser.add_argument('--encoder_train',default=False, type=bool)
-    parser.add_argument('--PCAlabel',     default=True, type=bool)
-    parser.add_argument('--load_weight',  default=False, type=bool)  
+    parser.add_argument('--PCAlabel',     default=False, type=bool)
+    parser.add_argument('--load_weight',  default=True, type=bool)  
     
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
@@ -81,7 +81,7 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
     test_1D = scaler_transform(test_1D, scaler)
     test_extract = scaler_transform(test_extract, scaler)
   
-  val_2D, val_1D, val_extract, val_label_RUL = test_2D[:100], test_1D[:100], test_extract[:100], test_label_RUL[:100]
+  val_2D, val_1D, val_extract, val_label_RUL = test_2D, test_1D, test_extract, test_label_RUL
   val_data = [val_1D, val_2D, val_extract]
 
   input_extracted = Input((14, 2), name='Extracted_LSTM_input')
@@ -147,7 +147,7 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
   train_label_Con = to_onehot(train_label_Con)
   test_label_Con  = to_onehot(test_label_Con)
 
-  val_2D, val_1D, val_extract, val_label_Con, val_label_RUL = test_2D[:100], test_1D[:100], test_extract[:100], test_label_Con[:100], test_label_RUL[:100]
+  val_2D, val_1D, val_extract, val_label_Con, val_label_RUL = test_2D, test_1D, test_extract, test_label_Con, test_label_RUL
   val_data = [val_1D, val_2D, val_extract]
   val_label = [val_label_Con, val_label_RUL]
 
