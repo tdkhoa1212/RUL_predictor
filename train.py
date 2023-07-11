@@ -1,7 +1,7 @@
 from model.MIX_1D_2D import mix_model_PHM, mix_model_XJTU
 from model.resnet import resnet_101, resnet_34
 from model.LSTM import lstm_extracted_model, lstm_model
-from utils.tools import to_onehot, scaler_transform
+from utils.tools import to_onehot, scaler_transform, all_matric_XJTU, all_matric_PHM
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from sklearn.preprocessing import MinMaxScaler
@@ -36,7 +36,7 @@ def parse_opt(known=False):
     parser.add_argument('--save_dir',       default='/content/drive/MyDrive/Khoa/results/RUL', type=str)
     parser.add_argument('--data_type',      default=['1d', '2d', 'extract'], type=list, help='shape of data. They can be 1d, 2d, extract')
     parser.add_argument('--train_bearing',  default=['Bearing1_1', 'Bearing1_2', 'Bearing2_1', 'Bearing2_2', 'Bearing3_1', 'Bearing3_2'], type=str, nargs='+')   
-    parser.add_argument('--test_bearing',   default=['Bearing1_3', 'Bearing1_4','Bearing1_5', 'Bearing2_3', 'Bearing2_4','Bearing2_5', 'Bearing3_3', 'Bearing3_4', 'Bearing3_5'], type=str, nargs='+')
+    parser.add_argument('--test_bearing',   default=['Bearing1_1', 'Bearing1_2', 'Bearing1_3', 'Bearing1_5', 'Bearing2_1', 'Bearing2_2',  'Bearing2_3', 'Bearing2_4', 'Bearing2_5', 'Bearing3_1', 'Bearing3_3', 'Bearing3_4', 'Bearing3_5'], type=str, nargs='+')
     parser.add_argument('--condition',      default='c_all', type=str, help='c_1, c_2, c_3, c_all')
     parser.add_argument('--type',           default='XJTU', type=str, help='PHM, XJTU')
     parser.add_argument('--case',           default='case2', type=str, help='case1, case2')
@@ -115,10 +115,16 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
                         batch_size = opt.batch_size,
                         validation_data = (val_data, val_label_RUL))
   network.save(weight_path)
-  _, RUL_mae, RUL_r_square, RUL_mean_squared_error = network.evaluate(test_data, test_label_RUL, verbose=0)
-  RUL_mae = round(RUL_mae, 4)
-  RUL_r_square = round(RUL_r_square, 4)
-  RUL_mean_squared_error = round(RUL_mean_squared_error, 4)
+
+  # ------------------------- PREDICT -------------------------------------
+  RUL = mix_model_PHM(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, False)
+  network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=RUL)
+  network.load_weights(weight_path)
+  RUL = network.predict(test_data)
+  r2, mae_, mse_ = all_matric_PHM(test_label_RUL, RUL)
+  RUL_mae = round(mae_, 4)
+  RUL_r_square = round(r2, 4)
+  RUL_mean_squared_error = round(mse_, 4)
   print(f'\n----------Score in test set: \n mae: {RUL_mae}, r2: {RUL_r_square}, rmse: {RUL_mean_squared_error}\n' )
 
 # Train and test for XJTU data ############################################################################################
@@ -185,11 +191,16 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
                         batch_size = opt.batch_size,
                         validation_data = (val_data, val_label))
   network.save(weight_path)
-  _, _, _, Condition_acc, _, _, _, _, RUL_mae, RUL_r_square, RUL_mean_squared_error = network.evaluate(test_data, test_label, verbose=0)
-  Condition_acc = round(Condition_acc*100, 4)
-  RUL_mae = round(RUL_mae, 4)
-  RUL_r_square = round(RUL_r_square, 4)
-  RUL_mean_squared_error = round(RUL_mean_squared_error, 4)
+  # ------------------------- PREDICT -------------------------------------
+  Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, False)
+  network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
+  network.load_weights(weight_path)
+  r2, mae_, mse_, acc = all_matric_XJTU(test_label_RUL, RUL, test_label_Con, Condition)
+  Condition_acc = round(acc*100, 4)
+  RUL_mae = round(mae_, 4)
+  RUL_r_square = round(r2, 4)
+  RUL_mean_squared_error = round(mse_, 4)
+
   print(f'\n----------Score in test set: \n Condition acc: {Condition_acc}, mae: {RUL_mae}, r2: {RUL_r_square}, rmse: {RUL_mean_squared_error}\n' )
 
 if __name__ == '__main__':
