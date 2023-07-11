@@ -1,7 +1,7 @@
 from model.MIX_1D_2D import mix_model_PHM, mix_model_XJTU
 from model.resnet import resnet_101, resnet_34
 from model.LSTM import lstm_extracted_model, lstm_model
-from utils.tools import to_onehot, scaler_transform, all_matric_XJTU, all_matric_PHM
+from utils.tools import back_onehot, to_onehot, scaler_transform, all_matric_XJTU, all_matric_PHM
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from sklearn.preprocessing import MinMaxScaler
@@ -191,10 +191,15 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
                         batch_size = opt.batch_size,
                         validation_data = (val_data, val_label))
   network.save(weight_path)
+
   # ------------------------- PREDICT -------------------------------------
   Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, False)
   network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
   network.load_weights(weight_path)
+  Condition, RUL = network.predict(test_data)
+  Condition = back_onehot(Condition)
+  test_label_Con = back_onehot(test_label_Con)
+
   r2, mae_, mse_, acc = all_matric_XJTU(test_label_RUL, RUL, test_label_Con, Condition)
   Condition_acc = round(acc*100, 4)
   RUL_mae = round(mae_, 4)
