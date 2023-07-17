@@ -10,9 +10,8 @@ opt = parse_opt()
 main_dir_colab = join(opt.main_dir_colab, 'XJTU_data/XJTU-SY_Bearing_Datasets')
 saved_dir = join(opt.main_dir_colab, 'XJTU_data/saved_data')
 
-if opt.case == 'case1':
-  # FPT points of bearing sets ==================================================================================
-  FPT = {'Bearing1_1': 76,
+# FPT points of bearing sets ==================================================================================
+FPT = {'Bearing1_1': 76,
         'Bearing1_2': 44,
         'Bearing1_3': 60,
         'Bearing1_5': 39,
@@ -26,6 +25,7 @@ if opt.case == 'case1':
         'Bearing3_4': 1418,
         'Bearing3_5': 9}
 
+if opt.case == 'case1':
   if (opt.encoder_train) and opt.predict == False:
     EC_XJTU_path = join(opt.save_dir, 'XJTU.h5')
     test_1D, test_2D, test_extract, test_label_RUL, test_label_Con = getting_data(saved_dir, opt.test_bearing, opt)
@@ -145,23 +145,6 @@ if opt.case == 'case1':
 
       print(f'\n Saving data in {opt.type} data set'+'-'*100)
 else:
-  # FPT points of bearing sets ==================================================================================
-  FPT = {'Bearing1_1': 76,
-        'Bearing1_2': 44,
-        'Bearing1_3': 60,
-        'Bearing1_4': 80,
-        'Bearing1_5': 39,
-        'Bearing2_1': 455,
-        'Bearing2_2': 48,
-        'Bearing2_3': 327,
-        'Bearing2_4': 32,
-        'Bearing2_5': 141,
-        'Bearing3_1': 2344,
-        'Bearing3_2': 1230,
-        'Bearing3_3': 340,
-        'Bearing3_4': 1418,
-        'Bearing3_5': 9}
-
   if (opt.encoder_train) and opt.predict == False:
     EC_XJTU_path = join(opt.save_dir, 'XJTU.h5')
     test_1D, test_2D, test_extract, test_label_RUL, test_label_Con = getting_data(saved_dir, opt.test_bearing, opt)

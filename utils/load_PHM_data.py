@@ -13,16 +13,26 @@ train_dir = join(opt.main_dir_colab, 'PHM_data/Learning_set')
 test_dir = join(opt.main_dir_colab, 'PHM_data/Test_set')
 saved_dir = join(opt.main_dir_colab, 'PHM_data/saved_data')
 
-if opt.case == 'case1':
-  # FPT points of bearing sets ==================================================================================
-  FPT = {'Bearing1_1': 1314,
-        'Bearing1_2': 826,
-        'Bearing1_3': 1726,
-        'Bearing1_4': 1082,
-        'Bearing1_5': 2412,
-        'Bearing1_6': 1631,
-        'Bearing1_7': 2210}
+# FPT points of bearing sets ==================================================================================
+FPT = {'Bearing1_1': 500,
+        'Bearing1_2': 66,
+        'Bearing1_3': 573,
+        'Bearing1_4': 40,
+        'Bearing1_5': 161,
+        'Bearing1_6': 146,
+        'Bearing1_7': 757,
+        'Bearing2_1': 32,
+        'Bearing2_2': 249,
+        'Bearing2_3': 753,
+        'Bearing2_4': 139,
+        'Bearing2_5': 309,
+        'Bearing2_6': 129,
+        'Bearing2_7': 58,
+        'Bearing3_1': 67,
+        'Bearing3_2': 133,
+        'Bearing3_3': 82}
 
+if opt.case == 'case1':
   # Train for encoder model ==================================================================================
   if (opt.encoder_train) and opt.predict == False:
     EC_PHM_path = join(opt.save_dir, 'PHM.h5')
@@ -78,25 +88,6 @@ if opt.case == 'case1':
   test_1D, test_2D, test_extract, test_label_RUL, test_idx = getting_data(saved_dir, opt.test_bearing, opt, get_index=True)
   train_1D, train_2D, train_extract, train_label_RUL = getting_data(saved_dir, opt.train_bearing, opt)
 else:
-  # FPT points of bearing sets ==================================================================================
-  FPT = {'Bearing1_1': 500,
-        'Bearing1_2': 66,
-        'Bearing1_3': 573,
-        'Bearing1_4': 40,
-        'Bearing1_5': 161,
-        'Bearing1_6': 146,
-        'Bearing1_7': 757,
-        'Bearing2_1': 32,
-        'Bearing2_2': 249,
-        'Bearing2_3': 753,
-        'Bearing2_4': 139,
-        'Bearing2_5': 309,
-        'Bearing2_6': 129,
-        'Bearing2_7': 58,
-        'Bearing3_1': 67,
-        'Bearing3_2': 133,
-        'Bearing3_3': 82}
-
   # Train for encoder model ==================================================================================
   if (opt.encoder_train) and opt.predict == False:
     EC_PHM_path = join(opt.save_dir, 'PHM.h5')

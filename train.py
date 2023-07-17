@@ -44,7 +44,7 @@ def parse_opt(known=False):
     parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data_new/data', type=str)
 
     parser.add_argument('--epochs',         default=300, type=int)
-    parser.add_argument('--EC_epochs',      default=600, type=int)
+    parser.add_argument('--EC_epochs',      default=200, type=int)
     parser.add_argument('--batch_size',     default=16, type=int)
     parser.add_argument('--input_shape',    default=2560, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
     
@@ -183,7 +183,6 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
                     ) # https://keras.io/api/losses/ 
   network.summary()
 
-  # dataset_train = tf.data.Dataset.from_tensor_slices((train_data , train_label)).batch(opt.batch_size)
   tf.debugging.set_log_device_placement(True)
 
   history = network.fit(train_data , train_label,
