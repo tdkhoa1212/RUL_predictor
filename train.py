@@ -35,18 +35,18 @@ def parse_opt(known=False):
    
     parser.add_argument('--save_dir',       default='/content/drive/MyDrive/Khoa/results/RUL', type=str)
     parser.add_argument('--data_type',      default=['1d', '2d', 'extract'], type=list, help='shape of data. They can be 1d, 2d, extract')
-    parser.add_argument('--train_bearing',  default=['Bearing1_1', 'Bearing1_2', 'Bearing2_1', 'Bearing2_2', 'Bearing3_1', 'Bearing3_2'], type=str, nargs='+')   
-    parser.add_argument('--test_bearing',   default=['Bearing1_1', 'Bearing1_2', 'Bearing1_3', 'Bearing1_4', 'Bearing1_5', 'Bearing1_6',  'Bearing1_7'], type=str, nargs='+')
+    parser.add_argument('--train_bearing',  default=['Bearing2_1', 'Bearing2_2', 'Bearing2_3', 'Bearing2_4'], type=str, nargs='+')   
+    parser.add_argument('--test_bearing',   default=['Bearing2_5'], type=str, nargs='+')
     parser.add_argument('--condition',      default='c_all', type=str, help='c_1, c_2, c_3, c_all')
-    parser.add_argument('--type',           default='PHM', type=str, help='PHM, XJTU')
-    parser.add_argument('--case',           default='case1', type=str, help='case1, case2')
+    parser.add_argument('--type',           default='XJTU', type=str, help='PHM, XJTU')
+    parser.add_argument('--case',           default='case3', type=str, help='case1: OC independent rule, case2: OC dependent rule, case3: A Remaining Useful Life Prediction Method of Rolling Bearings Based on Deep Reinforcement Learning')
     parser.add_argument('--scaler',         default=None, type=str, help='PowerTransformer')
     parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data_new/data', type=str)
 
     parser.add_argument('--epochs',         default=300, type=int)
     parser.add_argument('--EC_epochs',      default=200, type=int)
     parser.add_argument('--batch_size',     default=16, type=int)
-    parser.add_argument('--input_shape',    default=2560, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
+    parser.add_argument('--input_shape',    default=32768, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
     
     parser.add_argument('--predict_time', default=False, type=bool)
     parser.add_argument('--predict',      default=False, type=bool)
@@ -209,6 +209,9 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
 
 if __name__ == '__main__':
   opt = parse_opt()
+  print(f"Current training bearing: {opt.train_bearing}") 
+  print(f"Current test bearing: {opt.test_bearing}\n") 
+
   # start_save_data(opt)
   if opt.type == 'PHM' and opt.case == 'case1':
     from utils.load_PHM_data import train_1D, train_2D, train_extract, train_label_RUL,\

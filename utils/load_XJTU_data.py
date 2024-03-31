@@ -5,25 +5,41 @@ from utils.tools import save_df, convert_to_image, getting_data
 from utils.train_encoder import train_EC
 from os.path import join, exists
 
+
 opt = parse_opt()
 
 main_dir_colab = join(opt.main_dir_colab, 'XJTU_data/XJTU-SY_Bearing_Datasets')
 saved_dir = join(opt.main_dir_colab, 'XJTU_data/saved_data')
 
 # FPT points of bearing sets ==================================================================================
-FPT = {'Bearing1_1': 76,
+if opt.case == 'case3':
+  FPT = {'Bearing1_1': 76,
         'Bearing1_2': 44,
         'Bearing1_3': 60,
         'Bearing1_5': 39,
-        'Bearing2_1': 455,
-        'Bearing2_2': 48,
-        'Bearing2_3': 327,
-        'Bearing2_4': 32,
-        'Bearing2_5': 141,
+        'Bearing2_1': 453, # case 3 
+        'Bearing2_2': 47, # case 3
+        'Bearing2_3': 303, # case 3
+        'Bearing2_4': 30, # case 3
+        'Bearing2_5': 121, # case 3
         'Bearing3_1': 2344,
         'Bearing3_3': 340,
         'Bearing3_4': 1418,
         'Bearing3_5': 9}
+else:
+  FPT = {'Bearing1_1': 76,
+          'Bearing1_2': 44,
+          'Bearing1_3': 60,
+          'Bearing1_5': 39,
+          'Bearing2_1': 455,
+          'Bearing2_2': 48,
+          'Bearing2_3': 327,
+          'Bearing2_4': 32,
+          'Bearing2_5': 141,
+          'Bearing3_1': 2344,
+          'Bearing3_3': 340,
+          'Bearing3_4': 1418,
+          'Bearing3_5': 9}
 
 if opt.case == 'case1':
   if (opt.encoder_train) and opt.predict == False:
