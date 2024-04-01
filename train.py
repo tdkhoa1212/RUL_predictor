@@ -41,7 +41,7 @@ def parse_opt(known=False):
     parser.add_argument('--type',           default='XJTU', type=str, help='PHM, XJTU')
     parser.add_argument('--case',           default='case3', type=str, help='case1: OC independent rule, case2: OC dependent rule, case3: A Remaining Useful Life Prediction Method of Rolling Bearings Based on Deep Reinforcement Learning')
     parser.add_argument('--scaler',         default=None, type=str, help='PowerTransformer')
-    parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data_new/data', type=str)
+    parser.add_argument('--main_dir_colab', default='/content/drive/MyDrive/Khoa/data', type=str)
 
     parser.add_argument('--epochs',         default=300, type=int)
     parser.add_argument('--EC_epochs',      default=200, type=int)

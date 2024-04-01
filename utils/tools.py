@@ -261,10 +261,10 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
     type_: PHM, XJTU
     '''
     data = {'x': [], 'y': []}
-    if type_data == '2d':
-      print('-'*10, f'Convert to 2D data', '-'*10, '\n')
-    else:
-      print('-'*10, f'Maintain 1D data', '-'*10, '\n')
+    # if type_data == '2d':
+    #   print('-'*10, f'Convert to 2D data', '-'*10, '\n')
+    # else:
+    #   print('-'*10, f'Maintain 1D data', '-'*10, '\n')
     
     num_files = len([i for i in os.listdir(name_bearing)])
     if opt.encoder_train and type_data != '2d':
@@ -329,7 +329,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
       t_label = np.linspace(1, 0, len(data['x'][time: ]))
       data['y'] = t_label
       nameB, shapeB = name_bearing.split('/')[-1], data['x'].shape
-      print(f'Original shape of {nameB} data: {shapeB}')
+      # print(f'Original shape of {nameB} data: {shapeB}')
       t_data = data['x'][time: ]
       data['x'] = t_data
     else:
@@ -338,7 +338,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
         
     ############## 1D-data to extraction data #####################
     if type_data=='extract':
-      print('-'*10, 'Convert to Extracted data', '-'*10, '\n')
+      # print('-'*10, 'Convert to Extracted data', '-'*10, '\n')
       hor_data = extracted_feature_of_signal(np.array(data['x'])[:, :, 0])
       ver_data = extracted_feature_of_signal(np.array(data['x'])[:, :, 1])
       data_x = np.concatenate((hor_data, ver_data), axis=-1)
@@ -365,7 +365,7 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
         if opt.scaler != None:
           hor_data = np.array(data['x'])[:, :, 0]
           ver_data = np.array(data['x'])[:, :, 1]
-          print('-'*10, f'Use scaler: {opt.scaler}', '-'*10, '\n')
+          # print('-'*10, f'Use scaler: {opt.scaler}', '-'*10, '\n')
           if opt.scaler == 'FFT':
             hor_data = np.expand_dims(FFT(hor_data), axis=-1)
             ver_data = np.expand_dims(FFT(ver_data), axis=-1)
@@ -378,13 +378,13 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
           data_x = np.concatenate((hor_data, ver_data), axis=-1)
           data['x'] = data_x
         else:
-          print('-'*10, 'Raw data', '-'*10, '\n')
+          # print('-'*10, 'Raw data', '-'*10, '\n')
           data['x'] = np.array(data['x'])
     #     data['y'], _ = fit_values(2.31e-5, 0.99, 1.10, 1.68e-93, 28.58, np.array(data['y']))
 
     x_shape = data['x'].shape
     y_shape = np.array(data['y']).shape
-    print(f'Train data shape: {x_shape}   Train label shape: {y_shape}\n')
+    print(f'Train data shape: {x_shape}   Train label shape: {y_shape}')
     return data
 
 def FFT(signals):

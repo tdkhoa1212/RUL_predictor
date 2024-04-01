@@ -41,8 +41,8 @@ else:
           'Bearing3_4': 1418,
           'Bearing3_5': 9}
 
-if opt.case == 'case1':
-  if (opt.encoder_train) and opt.predict == False:
+if opt.case == 'case1' or opt.case == 'case3':
+  if os.path.exists(join(saved_dir, 'Bearing2_4_data_1d.npy')) == True and (opt.encoder_train) and opt.predict == False:
     EC_XJTU_path = join(opt.save_dir, 'XJTU.h5')
     test_1D, test_2D, test_extract, test_label_RUL, test_label_Con = getting_data(saved_dir, opt.test_bearing, opt)
     train_1D, train_2D, train_extract, train_label_RUL, train_label_Con = getting_data(saved_dir, opt.train_bearing, opt)
@@ -52,8 +52,9 @@ if opt.case == 'case1':
     train_EC(train_1D * train_1D_filter, 'XJTU', opt)
 
   # Saving the converted data ==================================================================================
-  if (os.path.exists(join(saved_dir, 'Bearing1_4_data_1d.npy')) == False or opt.encoder_train == True) and opt.predict == False:
+  if (os.path.exists(join(saved_dir, 'Bearing2_4_data_1d.npy')) == False or opt.encoder_train == True) and opt.predict == False:
     for type_data in opt.data_type:
+      print(f'\nProcessing type: {type_data}\n')
       # Train data-------------------------------------------------------------------------
       Bearing1_1_path = join(main_dir_colab, '35Hz12kN', 'Bearing1_1')
       Bearing1_1 = convert_to_image(Bearing1_1_path, opt, type_data, FPT['Bearing1_1'], 'XJTU')
@@ -159,9 +160,9 @@ if opt.case == 'case1':
         save_df(join(saved_dir, 'Bearing3_5_label_RUL.npy') , Bearing3_5['y'])
         save_df(join(saved_dir, 'Bearing3_5_label_Con.npy') , Bearing3_5_label_Con)
 
-      print(f'\n Saving data in {opt.type} data set'+'-'*100)
+      print('-'*100 + f'Saving data in {opt.type} data set'+'-'*100)
 else:
-  if (opt.encoder_train) and opt.predict == False:
+  if os.path.exists(join(saved_dir, 'Bearing1_4_data_1d.npy')) == True and (opt.encoder_train) and opt.predict == False:
     EC_XJTU_path = join(opt.save_dir, 'XJTU.h5')
     test_1D, test_2D, test_extract, test_label_RUL, test_label_Con = getting_data(saved_dir, opt.test_bearing, opt)
     train_1D, train_2D, train_extract, train_label_RUL, train_label_Con = getting_data(saved_dir, opt.train_bearing, opt)
@@ -171,7 +172,7 @@ else:
     train_EC(train_1D*train_1D_filter, 'XJTU', EC_XJTU_path, opt)
 
   # Saving the converted data ==================================================================================
-  if (os.path.exists(join(saved_dir, 'Bearing1_4_data_1d.npy')) == False or opt.encoder_train == True) and opt.predict == False:
+  if (os.path.exists(join(saved_dir, 'Bearing2_4_data_1d.npy')) == False or opt.encoder_train == True) and opt.predict == False:
     for type_data in opt.data_type:
       # Train data-------------------------------------------------------------------------
       Bearing1_1_path = join(main_dir_colab, '35Hz12kN', 'Bearing1_1')
