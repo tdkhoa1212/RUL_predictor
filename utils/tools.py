@@ -488,70 +488,75 @@ def percent_error(y_true, y_pred):
     return np.mean(A), SD
 
 def getting_data(saved_dir, bearing_list, opt, get_index=False):
-  _1D = []
-  _2D = []
-  extract = []
+    _1D_data = []
+    _2D_data = []
+    extract_data = []
 
-  # Creating empty folder to catch labels--------------
-  if opt.type == 'PHM' and opt.case == 'case1':
-    label_RUL_all = []
-    state = 0
-  else:
-    label_RUL_all = []
-    label_Con_all = []
-    state = 1
-
-  if get_index:
-    idx = {}
-
-  # Arranging data and labels in scheme---------------
-  for name in bearing_list:
-    for type_data in opt.data_type:
-      # Loading data and labels-----------------------
-      data     = load_df(join(saved_dir, name + '_data_'  + type_data + '.npy'))
-      label_RUL= load_df(join(saved_dir, name + '_label_RUL.npy'))
-      if get_index:
-        idx[name] = label_RUL.shape[0]
-      if state == 1:
-        label_Con = load_df(join(saved_dir, name + '_label_Con.npy'))
-
-      # Getting 1D data and labels-----------------------------------
-      if type_data == '1d':
-        if _1D == []:
-          _1D = data 
-          label_RUL_all = label_RUL
-          if state == 1:
-            label_Con_all = label_Con
-        else:
-          _1D = np.concatenate((_1D, data))
-          label_RUL_all = np.concatenate((label_RUL_all, label_RUL))
-          if state == 1:
-            label_Con_all = np.concatenate((label_Con_all, label_Con))
-
-      # Getting 2D data --------------------------------------------
-      elif type_data == '2d':
-        if _2D == []:
-          _2D = data 
-        else:
-          _2D = np.concatenate((_2D, data))
-      
-      # Getting extract data ---------------------------------------
-      else:
-        if extract == []:
-          extract = data 
-        else:
-          extract = np.concatenate((extract, data))
-
-  if opt.type == 'PHM' and opt.case == 'case1':
-    if get_index:
-      return _1D, _2D, extract, label_RUL_all, idx
+    # Creating empty folders to catch labels--------------
+    if opt.type == 'PHM' and opt.case == 'case1':
+        RUL_labels = []
+        state = 0
     else:
-      return _1D, _2D, extract, label_RUL_all
-  else:
+        RUL_labels = []
+        Con_labels = []
+        state = 1
+
     if get_index:
-      return _1D, _2D, extract, label_RUL_all, label_Con_all, idx
+        idx = {}
+
+    # Arranging data and labels in scheme---------------
+    for name in bearing_list:
+        for data_type in opt.data_type:
+            # Loading data and labels-----------------------
+            data_file = f"{name}_data_{data_type}.npy"
+            label_file = f"{name}_label_RUL.npy"
+
+            data = load_df(join(saved_dir, data_file))
+            RUL_label = load_df(join(saved_dir, label_file))
+
+            if get_index:
+                idx[name] = RUL_label.shape[0]
+
+            if state == 1:
+                Con_label = load_df(join(saved_dir, label_file))
+
+            # Getting 1D data and labels-----------------------------------
+            if data_type == '1d':
+                if len(_1D_data) == 0:
+                    _1D_data = data
+                    RUL_labels = RUL_label
+                    if state == 1:
+                        Con_labels = Con_label
+                else:
+                    _1D_data = np.concatenate((_1D_data, data))
+                    RUL_labels = np.concatenate((RUL_labels, RUL_label))
+                    if state == 1:
+                        Con_labels = np.concatenate((Con_labels, Con_label))
+
+            # Getting 2D data --------------------------------------------
+            elif data_type == '2d':
+                if len(_2D_data) == 0:
+                    _2D_data = data
+                else:
+                    _2D_data = np.concatenate((_2D_data, data))
+
+            # Getting extract data ---------------------------------------
+            else:
+                if len(extract_data) == 0:
+                    extract_data = data
+                else:
+                    extract_data = np.concatenate((extract_data, data))
+
+    if opt.type == 'PHM' and opt.case == 'case1':
+        if get_index:
+            return _1D_data, _2D_data, extract_data, RUL_labels, idx
+        else:
+            return _1D_data, _2D_data, extract_data, RUL_labels
     else:
-      return _1D, _2D, extract, label_RUL_all, label_Con_all
+        if get_index:
+            return _1D_data, _2D_data, extract_data, RUL_labels, Con_labels, idx
+        else:
+            return _1D_data, _2D_data, extract_data, RUL_labels, Con_labels
 
 def predict_time(data_l, nor = 20):
   '''

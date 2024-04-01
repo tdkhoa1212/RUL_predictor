@@ -15,7 +15,10 @@ import tensorflow_addons as tfa
 import argparse
 import os
 import tensorflow as tf
+import warnings
 
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+warnings.filterwarnings("ignore")
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
@@ -48,12 +51,11 @@ def parse_opt(known=False):
     parser.add_argument('--batch_size',     default=16, type=int)
     parser.add_argument('--input_shape',    default=32768, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
     
-    parser.add_argument('--predict_time', default=False, type=bool)
-    parser.add_argument('--predict',      default=False, type=bool)
+    parser.add_argument('--predict',      default=True, type=bool)
     parser.add_argument('--mix_model',    default=True,  type=bool)
     parser.add_argument('--encoder_train',default=False, type=bool)
     parser.add_argument('--PCAlabel',     default=False, type=bool)
-    parser.add_argument('--load_weight',  default=True, type=bool)  
+    parser.add_argument('--load_weight',  default=False, type=bool)  
     
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
