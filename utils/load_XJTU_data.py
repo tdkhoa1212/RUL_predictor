@@ -46,10 +46,10 @@ if opt.case == 'case1' or opt.case == 'case3':
     EC_XJTU_path = join(opt.save_dir, 'XJTU.h5')
     test_1D, test_2D, test_extract, test_label_RUL, test_label_Con = getting_data(saved_dir, opt.test_bearing, opt)
     train_1D, train_2D, train_extract, train_label_RUL, train_label_Con = getting_data(saved_dir, opt.train_bearing, opt)
-    s_0, s_1, s_2 = train_1D.shape
-    train_1D = train_1D.reshape((s_0, s_2, s_1))
-    train_1D_filter = np.where(train_1D>0, 1, -1)
-    train_EC(train_1D * train_1D_filter, 'XJTU', opt)
+    # s_0, s_1, s_2 = train_1D.shape
+    # train_1D = train_1D.reshape((s_0, s_2, s_1))
+    # train_1D_filter = np.where(train_1D>0, 1, -1)
+    # train_EC(train_1D * train_1D_filter, 'XJTU', opt)
 
   else:
     for type_data in opt.data_type:
@@ -165,10 +165,10 @@ else:
     EC_XJTU_path = join(opt.save_dir, 'XJTU.h5')
     test_1D, test_2D, test_extract, test_label_RUL, test_label_Con = getting_data(saved_dir, opt.test_bearing, opt)
     train_1D, train_2D, train_extract, train_label_RUL, train_label_Con = getting_data(saved_dir, opt.train_bearing, opt)
-    s_0, s_1, s_2 = train_1D.shape
-    train_1D = train_1D.reshape((s_0, s_2, s_1))
-    train_1D_filter = np.where(train_1D>0, 1, -1)
-    train_EC(train_1D*train_1D_filter, 'XJTU', EC_XJTU_path, opt)
+    # s_0, s_1, s_2 = train_1D.shape
+    # train_1D = train_1D.reshape((s_0, s_2, s_1))
+    # train_1D_filter = np.where(train_1D>0, 1, -1)
+    # train_EC(train_1D*train_1D_filter, 'XJTU', EC_XJTU_path, opt)
 
   # Saving the converted data ==================================================================================
   else:
