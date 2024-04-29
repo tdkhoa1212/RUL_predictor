@@ -57,7 +57,9 @@ def parse_opt(known=False):
     parser.add_argument('--encoder_train',default=False, type=bool)
     parser.add_argument('--PCAlabel',     default=False, type=bool)
     parser.add_argument('--load_weight',  default=False, type=bool)  
-    parser.add_argument('--only_test',    default=True, type=bool) 
+    parser.add_argument('--only_test',    default=False, type=bool) 
+    parser.add_argument('--only_RUL',     default=False, type=bool) 
+
     
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
@@ -133,7 +135,7 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
   print(f'\n----------Score in test set: \n mae: {RUL_mae}, r2: {RUL_r_square}, rmse: {RUL_mean_squared_error}\n' )
 
 # Train and test for XJTU data ############################################################################################
-def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, only_test=False):  
+def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, only_test=False, only_RUL=True):  
   if opt.scaler != None:
     print(f'\nUse scaler: {opt.scaler}--------------\n')
     if opt.scaler == 'MinMaxScaler':
@@ -166,7 +168,11 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
   input_extracted = Input((14, 2), name='Extracted_LSTM_input')
   input_1D = Input((opt.input_shape, 2), name='LSTM_CNN1D_input')
   input_2D = Input((128, 128, 2), name='CNN_input')
-  Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
+  
+  if only_RUL:
+    RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
+  else:
+    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
   network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
 
   # get three types of different forms from original data-------------------------------
@@ -177,7 +183,7 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
   
   weight_path = os.path.join(opt.save_dir, f'model_{opt.condition}_{opt.type}')
 
-  if only_test:
+  if only_test == False:
     if opt.load_weight:
       if os.path.exists(weight_path):
         print(f'\nLoad weight: {weight_path}\n')
@@ -200,12 +206,18 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
     network.save(weight_path)
 
   # ------------------------- PREDICT -------------------------------------
-  Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, False)
-  network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
-  network.load_weights(weight_path)
-  Condition, RUL = network.predict(test_data)
-  Condition = back_onehot(Condition)
-  test_label_Con = back_onehot(test_label_Con)
+  if only_RUL:
+    RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
+    network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=RUL)
+    network.load_weights(weight_path)
+    RUL = network.predict(test_data)
+  else:
+    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
+    network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
+    network.load_weights(weight_path)
+    Condition, RUL = network.predict(test_data)
+    Condition = back_onehot(Condition)
+    test_label_Con = back_onehot(test_label_Con)
 
   # SHAP explainer
   feature_names = ['1D', '2D', 'Extract']
@@ -214,13 +226,14 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
   shap.summary_plot(shap_values, features=test_data, feature_names=feature_names)
 
   # Validation matrix
-  r2, mae_, mse_, acc = all_matric_XJTU(test_label_RUL, RUL, test_label_Con, Condition)
-  Condition_acc = round(acc*100, 4)
-  RUL_mae = round(mae_, 4)
-  RUL_r_square = round(r2, 4)
-  RUL_mean_squared_error = round(mse_, 4)
+  if only_RUL == False:
+    r2, mae_, mse_, acc = all_matric_XJTU(test_label_RUL, RUL, test_label_Con, Condition)
+    Condition_acc = round(acc*100, 4)
+    RUL_mae = round(mae_, 4)
+    RUL_r_square = round(r2, 4)
+    RUL_mean_squared_error = round(mse_, 4)
 
-  print(f'\n----------Score in test set: \n Condition acc: {Condition_acc}, mae: {RUL_mae}, r2: {RUL_r_square}, rmse: {RUL_mean_squared_error}\n' )
+    print(f'\n----------Score in test set: \n Condition acc: {Condition_acc}, mae: {RUL_mae}, r2: {RUL_r_square}, rmse: {RUL_mean_squared_error}\n' )
 
 if __name__ == '__main__':
   opt = parse_opt()
