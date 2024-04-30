@@ -1,4 +1,4 @@
-from model.MIX_1D_2D import mix_model_PHM, mix_model_XJTU
+from model.MIX_1D_2D import mix_model_PHM, mix_model_XJTU, mix_model_XJTU_SHAP
 from model.resnet import resnet_101, resnet_34
 from model.LSTM import lstm_extracted_model, lstm_model
 from utils.tools import back_onehot, to_onehot, scaler_transform, all_matric_XJTU, all_matric_PHM
@@ -12,8 +12,10 @@ from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import QuantileTransformer
 from sklearn.preprocessing import PowerTransformer
 import tensorflow_addons as tfa
+from tensorflow.keras.layers import  Dense
 import argparse
 import os
+import numpy as np
 import shap
 import tensorflow as tf
 import warnings
@@ -57,8 +59,8 @@ def parse_opt(known=False):
     parser.add_argument('--encoder_train',default=False, type=bool)
     parser.add_argument('--PCAlabel',     default=False, type=bool)
     parser.add_argument('--load_weight',  default=False, type=bool)  
-    parser.add_argument('--only_test',    default=False, type=bool) 
-    parser.add_argument('--only_RUL',     default=False, type=bool) 
+    parser.add_argument('--only_test',    default=True, type=bool) 
+    parser.add_argument('--only_RUL',     default=True, type=bool) 
 
     
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
@@ -134,108 +136,161 @@ def main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, t
   RUL_mean_squared_error = round(mse_, 4)
   print(f'\n----------Score in test set: \n mae: {RUL_mae}, r2: {RUL_r_square}, rmse: {RUL_mean_squared_error}\n' )
 
-# Train and test for XJTU data ############################################################################################
-def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, only_test=False, only_RUL=True):  
-  if opt.scaler != None:
-    print(f'\nUse scaler: {opt.scaler}--------------\n')
-    if opt.scaler == 'MinMaxScaler':
-      scaler = MinMaxScaler
-    if opt.scaler == 'MaxAbsScaler':
-      scaler = MaxAbsScaler
-    if opt.scaler == 'StandardScaler':
-      scaler = StandardScaler
-    if opt.scaler == 'RobustScaler':
-      scaler = RobustScaler
-    if opt.scaler == 'Normalizer':
-      scaler = Normalizer
-    if opt.scaler == 'QuantileTransformer':
-      scaler = QuantileTransformer
-    if opt.scaler == 'PowerTransformer':
-      scaler = PowerTransformer
+# Train and test for XJTU data
+def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con):
+    if opt.scaler is not None:
+        print(f'\nUsing scaler: {opt.scaler}--------------\n')
+        scaler = get_scaler(opt.scaler)  # Helper function to get scaler instance
+        train_1D = scaler_transform(train_1D, scaler)
+        train_extract = scaler_transform(train_extract, scaler)
+        test_1D = scaler_transform(test_1D, scaler)
+        test_extract = scaler_transform(test_extract, scaler)
 
-    train_1D = scaler_transform(train_1D, scaler)
-    train_extract = scaler_transform(train_extract, scaler)
-    test_1D = scaler_transform(test_1D, scaler)
-    test_extract = scaler_transform(test_extract, scaler)
-  
-  train_label_Con = to_onehot(train_label_Con)
-  test_label_Con  = to_onehot(test_label_Con)
+    train_label_Con = to_onehot(train_label_Con)
+    test_label_Con = to_onehot(test_label_Con)
 
-  val_2D, val_1D, val_extract, val_label_Con, val_label_RUL = test_2D, test_1D, test_extract, test_label_Con, test_label_RUL
-  val_data = [val_1D, val_2D, val_extract]
-  val_label = [val_label_Con, val_label_RUL]
+    val_2D, val_1D, val_extract, val_label_Con, val_label_RUL = test_2D, test_1D, test_extract, test_label_Con, test_label_RUL
+    val_data = [val_1D, val_2D, val_extract]
+    val_label = [val_label_Con, val_label_RUL]
 
-  input_extracted = Input((14, 2), name='Extracted_LSTM_input')
-  input_1D = Input((opt.input_shape, 2), name='LSTM_CNN1D_input')
-  input_2D = Input((128, 128, 2), name='CNN_input')
-  
-  if only_RUL:
-    RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
-    network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=RUL)
+    input_extracted = Input((14, 2), name='Extracted_LSTM_input')
+    input_1D = Input((opt.input_shape, 2), name='LSTM_CNN1D_input')
+    input_2D = Input((128, 128, 2), name='CNN_input')
 
-  else:
-    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
+    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
     network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
 
-  # get three types of different forms from original data-------------------------------
-  train_data = [train_1D, train_2D, train_extract]
-  train_label = [train_label_Con, train_label_RUL]
-  test_data = [test_1D, test_2D, test_extract]
-  test_label = [test_label_Con, test_label_RUL]
-  
-  weight_path = os.path.join(opt.save_dir, f'model_{opt.condition}_{opt.type}')
+    # get three types of different forms from original data
+    train_data = [train_1D, train_2D, train_extract]
+    train_label = [train_label_Con, train_label_RUL]
+    test_data = [test_1D, test_2D, test_extract]
+    test_label = [test_label_Con, test_label_RUL]
 
-  if only_test == False:
+    weight_path = os.path.join(opt.save_dir, f'model_{opt.condition}_{opt.type}')
+
     if opt.load_weight:
-      if os.path.exists(weight_path):
-        print(f'\nLoad weight: {weight_path}\n')
-        network.load_weights(weight_path)
+        if os.path.exists(weight_path):
+            print(f'\nLoad weight: {weight_path}\n')
+            network.load_weights(weight_path)
+        else:
+            print(f'\nWeight file not found: {weight_path}\n')
     callback = tf.keras.callbacks.EarlyStopping(monitor='val_acc', patience=1)
     network.compile(optimizer=tf.keras.optimizers.RMSprop(1e-3),
-                    loss=['categorical_crossentropy', tf.keras.losses.MeanSquaredLogarithmicError()], 
-                    metrics=['acc', 'mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()], 
-                    loss_weights=[1, 1],
-  #                   run_eagerly=True
-                      ) # https://keras.io/api/losses/ 
+                    loss=['categorical_crossentropy', tf.keras.losses.MeanSquaredLogarithmicError()],
+                    metrics=['acc', 'mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()],
+                    loss_weights=[1, 1])
+
     network.summary()
 
-    tf.debugging.set_log_device_placement(True)
+    history = network.fit(train_data, train_label,
+                          epochs=opt.epochs,
+                          batch_size=opt.batch_size,
+                          validation_data=(val_data, val_label),
+                          callbacks=[callback])  # Include early stopping callback
 
-    history = network.fit(train_data , train_label,
-                          epochs     = opt.epochs,
-                          batch_size = opt.batch_size,
-                          validation_data = (val_data, val_label))
     network.save(weight_path)
 
-  # ------------------------- PREDICT -------------------------------------
-  if only_RUL:
-    RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
-    network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=RUL)
-    network.load_weights(weight_path)
-    RUL = network.predict(test_data)
-  else:
-    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
+    # ------------------------- PREDICT -------------------------------------
+    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
     network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
     network.load_weights(weight_path)
     Condition, RUL = network.predict(test_data)
     Condition = back_onehot(Condition)
     test_label_Con = back_onehot(test_label_Con)
 
-  # SHAP explainer
-  feature_names = ['1D', '2D', 'Extract']
-  explainer_shap = shap.DeepExplainer(network, train_data)
-  shap_values = explainer_shap.shap_values(test_data, check_additivity=False)
-  shap.summary_plot(shap_values, features=test_data, feature_names=feature_names)
+    print("Shape of train_data:", [x.shape for x in train_data])
+    print("Shape of test_data:", [x.shape for x in test_data])
 
-  # Validation matrix
-  if only_RUL == False:
+    # Validation matrix
     r2, mae_, mse_, acc = all_matric_XJTU(test_label_RUL, RUL, test_label_Con, Condition)
-    Condition_acc = round(acc*100, 4)
+    Condition_acc = round(acc * 100, 4)
     RUL_mae = round(mae_, 4)
     RUL_r_square = round(r2, 4)
     RUL_mean_squared_error = round(mse_, 4)
 
-    print(f'\n----------Score in test set: \n Condition acc: {Condition_acc}, mae: {RUL_mae}, r2: {RUL_r_square}, rmse: {RUL_mean_squared_error}\n' )
+    print(f'\n----------Score in test set: \n Condition acc: {Condition_acc}, mae: {RUL_mae}, r2: {RUL_r_square}, rmse: {RUL_mean_squared_error}\n')
+
+def main_XJTU_SHAP(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con):
+    if opt.scaler is not None:
+        print(f'\nUsing scaler: {opt.scaler}--------------\n')
+        scaler = get_scaler(opt.scaler)  # Helper function to get scaler instance
+        train_1D = scaler_transform(train_1D, scaler)
+        train_extract = scaler_transform(train_extract, scaler)
+        test_1D = scaler_transform(test_1D, scaler)
+        test_extract = scaler_transform(test_extract, scaler)
+
+    train_label_Con = to_onehot(train_label_Con)
+    test_label_Con = to_onehot(test_label_Con)
+
+    val_2D, val_1D, val_extract, val_label_Con, val_label_RUL = test_2D, test_1D, test_extract, test_label_Con, test_label_RUL
+    val_data = [val_1D, val_2D, val_extract]
+    val_label = [val_label_Con, val_label_RUL]
+
+    input_extracted = Input((14, 2), name='Extracted_LSTM_input')
+    input_1D = Input((opt.input_shape, 2), name='LSTM_CNN1D_input')
+    input_2D = Input((128, 128, 2), name='CNN_input')
+
+    Condition, RUL = mix_model_XJTU_SHAP(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
+    network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
+
+    # get three types of different forms from original data
+    train_data = [train_1D, train_2D, train_extract]
+    train_label = [train_label_Con, train_label_RUL]
+    test_data = [test_1D, test_2D, test_extract]
+    test_label = [test_label_Con, test_label_RUL]
+
+    weight_path = os.path.join(opt.save_dir, f'model_{opt.condition}_{opt.type}')
+
+    if opt.load_weight:
+        if os.path.exists(weight_path):
+            print(f'\nLoad weight: {weight_path}\n')
+            network.load_weights(weight_path)
+        else:
+            print(f'\nWeight file not found: {weight_path}\n')
+    callback = tf.keras.callbacks.EarlyStopping(monitor='val_acc', patience=1)
+    network.compile(optimizer=tf.keras.optimizers.RMSprop(1e-3),
+                    loss=['categorical_crossentropy', tf.keras.losses.MeanSquaredLogarithmicError()],
+                    metrics=['acc', 'mae', tfa.metrics.RSquare(), tf.keras.metrics.RootMeanSquaredError()],
+                    loss_weights=[1, 1])
+
+    network.summary()
+
+    history = network.fit(train_data, train_label,
+                          epochs=opt.epochs,
+                          batch_size=opt.batch_size,
+                          validation_data=(val_data, val_label),
+                          callbacks=[callback])  # Include early stopping callback
+
+    network.save(weight_path)
+
+    # ------------------------- PREDICT -------------------------------------
+    RUL = mix_model_XJTU_SHAP(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
+    network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=RUL)
+    network.load_weights(weight_path)
+
+    # Create the first model up to the merged_value_0 layer
+    first_model_output = network.layers[-2].output  # Extract output up to merged_value_0
+    first_model = Model(inputs=[input_1D, input_2D, input_extracted], outputs=first_model_output)
+
+    # Create the second model containing only the RUL layer
+    RUL_layer = Dense(1, activation='sigmoid', name='RUL')(first_model_output)
+    second_model = Model(inputs=first_model.inputs, outputs=RUL_layer)
+
+    # Verify the architecture of the models
+    first_model.summary()
+    second_model.summary()
+
+    # SHAP explainer train_1D, train_2D, train_extract
+    feature_names = ['1D', '2D', 'Extract']
+    extracted_train_data = first_model.predict(train_data)
+    extracted_test_data = first_model.predict(test_data)
+
+    explainer_shap = shap.DeepExplainer(network, extracted_train_data)
+    shap_values = explainer_shap.shap_values(extracted_test_data, check_additivity=False)  # Check additivity
+    summary_plot = shap.summary_plot(shap_values, features=extracted_test_data, feature_names=feature_names)
+    summary_plot.savefig(os.path.join(opt.save_dir, 'shap_summary_plot.png'))
+
+
 
 if __name__ == '__main__':
   opt = parse_opt()
@@ -246,12 +301,12 @@ if __name__ == '__main__':
   if opt.type == 'PHM' and opt.case == 'case1':
     from utils.load_PHM_data import train_1D, train_2D, train_extract, train_label_RUL,\
                                     test_1D, test_2D, test_extract, test_label_RUL
-    main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, test_2D, test_extract, test_label_RUL, opt.only_test)
+    main_PHM(opt, train_1D, train_2D, train_extract, train_label_RUL, test_1D, test_2D, test_extract, test_label_RUL)
   elif opt.type == 'PHM' and opt.case == 'case2':
     from utils.load_PHM_data import train_1D, train_2D, train_extract, train_label_Con, train_label_RUL,\
                                     test_1D, test_2D, test_extract, test_label_Con, test_label_RUL
-    main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, opt.only_RUL, opt.only_test)
+    main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con)
   else:
     from utils.load_XJTU_data import train_1D, train_2D, train_extract, train_label_Con, train_label_RUL,\
                                      test_1D, test_2D, test_extract, test_label_Con, test_label_RUL
-    main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, opt.only_RUL, opt.only_test)
+    main_XJTU_SHAP(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con)

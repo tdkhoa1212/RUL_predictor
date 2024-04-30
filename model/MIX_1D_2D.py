@@ -47,7 +47,7 @@ def reshape(x):
     out = Reshape((x.shape[-2]*x.shape[-3], x.shape[-1]))(x)
     return out
 
-def mix_model_XJTU(opt, cnn_1d_model, resnet_50, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, training=False):
+def mix_model_XJTU(opt, cnn_1d_model, resnet_50, lstm_extracted_model, input_1D, input_2D, input_extracted, training=False):
   out_1D = cnn_1d_model(opt, training, input_1D)
   out_2D = resnet_50(opt)(input_2D, training=training)
 
@@ -88,6 +88,42 @@ def mix_model_XJTU(opt, cnn_1d_model, resnet_50, lstm_extracted_model, input_1D,
               activation='sigmoid', 
               name='RUL')(merged_value_0)
   return Condition, RUL
+
+def mix_model_XJTU_SHAP(opt, cnn_1d_model, resnet_50, lstm_extracted_model, input_1D, input_2D, input_extracted, training=False):
+  out_1D = cnn_1d_model(opt, training, input_1D)
+  out_2D = resnet_50(opt)(input_2D, training=training)
+
+  out_extracted = lstm_extracted_model(opt, training, input_extracted)
+  
+  # 1D branch-------------------------------------------
+  network_1D = Model(input_1D, out_1D, name='network_1D')
+  # 2D branch-------------------------------------------
+  network_2D = Model(input_2D, out_2D, name='network_2D')
+  # Extracted branch-------------------------------------------
+  network_extracted = Model(input_extracted, out_extracted, name='network_extracted')
+  
+  # Hidden layers----------------------------------------------------------
+  hidden_out_1D = network_1D([input_1D])
+  hidden_out_2D = network_2D([input_2D])
+  hidden_out_extracted = network_extracted([input_extracted])
+  
+  # Transformer layers-----------------------------------------------------
+  rul_hidden_out_1D = TransformerLayer(hidden_out_1D, hidden_out_1D.shape[-1], training=training)
+  rul_hidden_out_2D = reshape(hidden_out_2D)
+  rul_hidden_out_2D = TransformerLayer(rul_hidden_out_2D, rul_hidden_out_2D.shape[-1], training=training)
+  rul_hidden_out_extracted = TransformerLayer(hidden_out_extracted, hidden_out_extracted.shape[-1], training=training)
+
+  rul_hidden_out_1D = Dense(1, activation='relu', name='1D_output')(rul_hidden_out_1D)
+  rul_hidden_out_2D = Dense(1, activation='relu', name='2D_output')(rul_hidden_out_2D)
+  rul_hidden_out_extracted = Dense(1, activation='relu', name='extracted_output')(rul_hidden_out_extracted)
+  
+  # Fully connected layers---------------------------------------------------
+  merged_value_0 = fully_concatenate(rul_hidden_out_1D, rul_hidden_out_2D, rul_hidden_out_extracted, training=training, fully=False)
+    
+  RUL = Dense(1, 
+              activation='sigmoid', 
+              name='RUL')(merged_value_0)
+  return RUL
 
 def mix_model_PHM(opt, cnn_1d_model, resnet_50, lstm_extracted_model, input_1D, input_2D, input_extracted, training=False):
   out_1D = cnn_1d_model(opt, training, input_1D)
