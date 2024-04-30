@@ -171,9 +171,11 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
   
   if only_RUL:
     RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
+    network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=RUL)
+
   else:
     Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, only_RUL, True)
-  network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
+    network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
 
   # get three types of different forms from original data-------------------------------
   train_data = [train_1D, train_2D, train_extract]
@@ -222,7 +224,7 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
   # SHAP explainer
   feature_names = ['1D', '2D', 'Extract']
   explainer_shap = shap.DeepExplainer(network, train_data)
-  shap_values = explainer_shap.shap_values(test_data)
+  shap_values = explainer_shap.shap_values(test_data, check_additivity=False)
   shap.summary_plot(shap_values, features=test_data, feature_names=feature_names)
 
   # Validation matrix
@@ -248,8 +250,8 @@ if __name__ == '__main__':
   elif opt.type == 'PHM' and opt.case == 'case2':
     from utils.load_PHM_data import train_1D, train_2D, train_extract, train_label_Con, train_label_RUL,\
                                     test_1D, test_2D, test_extract, test_label_Con, test_label_RUL
-    main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, opt.only_test)
+    main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, opt.only_RUL, opt.only_test)
   else:
     from utils.load_XJTU_data import train_1D, train_2D, train_extract, train_label_Con, train_label_RUL,\
                                      test_1D, test_2D, test_extract, test_label_Con, test_label_RUL
-    main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, opt.only_test)
+    main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, opt.only_RUL, opt.only_test)
