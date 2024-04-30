@@ -42,7 +42,7 @@ else:
           'Bearing3_5': 9}
 
 if opt.case == 'case1' or opt.case == 'case3':
-  if os.path.exists(join(saved_dir, 'Bearing2_4_data_1d.npy')) == True:
+  if os.path.exists(join(saved_dir, 'Bearing2_4_data_5d.npy')) == True: # true: Bearing2_4_data_1d
     EC_XJTU_path = join(opt.save_dir, 'XJTU.h5')
     test_1D, test_2D, test_extract, test_label_RUL, test_label_Con = getting_data(saved_dir, opt.test_bearing, opt)
     train_1D, train_2D, train_extract, train_label_RUL, train_label_Con = getting_data(saved_dir, opt.train_bearing, opt)

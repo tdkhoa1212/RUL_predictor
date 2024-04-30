@@ -280,6 +280,9 @@ def convert_to_image(name_bearing, opt, type_data, time=None, type_=None):
               df = pd.read_csv(file_, header=None)
               coef_h = extract_feature_image(df, opt, type_data, feature_name='horiz accel', type_=type_)
               coef_v = extract_feature_image(df, opt, type_data, feature_name='vert accel', type_=type_)
+              if (opt.noise_amplitude != 0):
+                 coef_h += np.random.normal(0, opt.noise_amplitude, len(coef_h))
+                 coef_v += np.random.normal(0, opt.noise_amplitude, len(coef_v))
               x_ = np.concatenate((coef_h, coef_v), axis=-1)
 
               if type_data == '1d' and opt.PCAlabel == True:

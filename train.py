@@ -58,7 +58,8 @@ def parse_opt(known=False):
     parser.add_argument('--EC_epochs',      default=200, type=int)
     parser.add_argument('--batch_size',     default=16, type=int)
     parser.add_argument('--input_shape',    default=32768, type=int, help='1279 for using fft, 2560 for raw data in PHM, 32768 for raw data in XJTU')
-    
+    parser.add_argument('--noise_amplitude',default=0.1, type=float)
+
     parser.add_argument('--predict',      default=True, type=bool)
     parser.add_argument('--mix_model',    default=True,  type=bool)
     parser.add_argument('--encoder_train',default=False, type=bool)
@@ -162,10 +163,9 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
     input_1D = Input((opt.input_shape, 2), name='LSTM_CNN1D_input')
     input_2D = Input((128, 128, 2), name='CNN_input')
 
-    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
+    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, opt, True)
     network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
 
-    # get three types of different forms from original data
     train_data = [train_1D, train_2D, train_extract]
     train_label = [train_label_Con, train_label_RUL]
     test_data = [test_1D, test_2D, test_extract]
@@ -312,21 +312,22 @@ def main_XJTU_ML(opt, train_1D, train_2D, train_extract, train_label_RUL, train_
 
 
     val_2D, val_1D, val_extract, val_label_Con, val_label_RUL = test_2D, test_1D, test_extract, test_label_Con, test_label_RUL
-    val_data = [val_1D, val_2D, val_extract]
+    train_extract = train_extract.reshape(train_extract.shape[0], train_extract.shape[1]*train_extract.shape[2])
+    val_extract = val_extract.reshape(val_extract.shape[0], val_extract.shape[1]*val_extract.shape[2])
 
     # Ridge Regression
     ridge = Ridge(alpha=1.0)
     ridge.fit(train_extract, train_label_RUL)
     ridge_pred = ridge.predict(val_extract)
     ridge_rmse = mean_squared_error(val_label_RUL, ridge_pred, squared=False)
-    print("Ridge Regression RMSE:", ridge_rmse)
+    print("Ridge Regression RMSE:", np.round(ridge_rmse, 4))
 
     # Random Forest Regression
     rf = RandomForestRegressor(n_estimators=100, random_state=42)
     rf.fit(train_extract, train_label_RUL)
     rf_pred = rf.predict(val_extract)
     rf_rmse = mean_squared_error(val_label_RUL, rf_pred, squared=False)
-    print("Random Forest Regression RMSE:", rf_rmse)
+    print("Random Forest Regression RMSE:", np.round(rf_rmse, 4))
 
     # XGBoost Regression
     xg_reg = xgb.XGBRegressor(objective ='reg:squarederror', colsample_bytree = 0.3, learning_rate = 0.1,
@@ -334,7 +335,7 @@ def main_XJTU_ML(opt, train_1D, train_2D, train_extract, train_label_RUL, train_
     xg_reg.fit(train_extract, train_label_RUL)
     xgb_pred = xg_reg.predict(val_extract)
     xgb_rmse = mean_squared_error(val_label_RUL, xgb_pred, squared=False)
-    print("XGBoost Regression RMSE:", xgb_rmse)
+    print("XGBoost Regression RMSE:", np.round(xgb_rmse, 4))
 
 if __name__ == '__main__':
   opt = parse_opt()
@@ -353,4 +354,4 @@ if __name__ == '__main__':
   else:
     from utils.load_XJTU_data import train_1D, train_2D, train_extract, train_label_Con, train_label_RUL,\
                                      test_1D, test_2D, test_extract, test_label_Con, test_label_RUL
-    main_XJTU_ML(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con)
+    main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con)
