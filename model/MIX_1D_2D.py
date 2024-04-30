@@ -113,9 +113,9 @@ def mix_model_XJTU_SHAP(opt, cnn_1d_model, resnet_50, lstm_extracted_model, inpu
   rul_hidden_out_2D = TransformerLayer(rul_hidden_out_2D, rul_hidden_out_2D.shape[-1], training=training)
   rul_hidden_out_extracted = TransformerLayer(hidden_out_extracted, hidden_out_extracted.shape[-1], training=training)
 
-  rul_hidden_out_1D = Dense(1, activation='relu', name='1D_output')(rul_hidden_out_1D)
-  rul_hidden_out_2D = Dense(1, activation='relu', name='2D_output')(rul_hidden_out_2D)
-  rul_hidden_out_extracted = Dense(1, activation='relu', name='extracted_output')(rul_hidden_out_extracted)
+  rul_hidden_out_1D = Dense(1, activation='sigmoid', name='1D_output')(rul_hidden_out_1D)
+  rul_hidden_out_2D = Dense(1, activation='sigmoid', name='2D_output')(rul_hidden_out_2D)
+  rul_hidden_out_extracted = Dense(1, activation='sigmoid', name='extracted_output')(rul_hidden_out_extracted)
   
   # Fully connected layers---------------------------------------------------
   merged_value_0 = fully_concatenate(rul_hidden_out_1D, rul_hidden_out_2D, rul_hidden_out_extracted, training=training, fully=False)
