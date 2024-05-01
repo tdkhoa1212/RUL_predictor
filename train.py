@@ -163,13 +163,16 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
     input_1D = Input((opt.input_shape, 2), name='LSTM_CNN1D_input')
     input_2D = Input((128, 128, 2), name='CNN_input')
 
-    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, opt, True)
+    Condition, RUL = mix_model_XJTU(opt, lstm_model, resnet_34, lstm_extracted_model, input_1D, input_2D, input_extracted, True)
     network = Model(inputs=[input_1D, input_2D, input_extracted], outputs=[Condition, RUL])
 
     train_data = [train_1D, train_2D, train_extract]
     train_label = [train_label_Con, train_label_RUL]
     test_data = [test_1D, test_2D, test_extract]
     test_label = [test_label_Con, test_label_RUL]
+
+    # train_data = [data + np.random.normal(scale=opt.noise_amplitude, size=data.shape) for data in train_data]
+    # test_data = [data + np.random.normal(scale=opt.noise_amplitude, size=data.shape) for data in test_data]
 
     weight_path = os.path.join(opt.save_dir, f'model_{opt.condition}_{opt.type}')
 
@@ -341,6 +344,7 @@ if __name__ == '__main__':
   opt = parse_opt()
   print(f"Current training bearing: {opt.train_bearing}") 
   print(f"Current test bearing: {opt.test_bearing}\n") 
+  print(f"Current noise: {opt.noise_amplitude}\n")
 
   # start_save_data(opt)
   if opt.type == 'PHM' and opt.case == 'case1':
