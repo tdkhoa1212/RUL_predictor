@@ -13,6 +13,7 @@ from sklearn.preprocessing import QuantileTransformer
 from sklearn.preprocessing import PowerTransformer
 import tensorflow_addons as tfa
 from tensorflow.keras.layers import  Dense
+import matplotlib.ticker as mtick
 import matplotlib.pyplot as plt
 import argparse
 import os
@@ -215,7 +216,7 @@ def main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_lab
 
     print(f'\n----------Score in test set: \n Condition acc: {Condition_acc}, mae: {RUL_mae}, r2: {RUL_r_square}, rmse: {RUL_mean_squared_error}\n')
 
-def main_XJTU_SHAP(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con, only_test):
+def main_XJTU_SHAP(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con):
     if opt.scaler is not None:
         print(f'\nUsing scaler: {opt.scaler}--------------\n')
         scaler = get_scaler(opt.scaler)  # Helper function to get scaler instance
@@ -243,7 +244,7 @@ def main_XJTU_SHAP(opt, train_1D, train_2D, train_extract, train_label_RUL, trai
 
     weight_path = os.path.join(opt.save_dir, f'model_{opt.condition}_{opt.type}')
 
-    if only_test == False:
+    if opt.only_test == False:
       if opt.load_weight:
           if os.path.exists(weight_path):
               print(f'\nLoad weight: {weight_path}\n')
@@ -293,10 +294,15 @@ def main_XJTU_SHAP(opt, train_1D, train_2D, train_extract, train_label_RUL, trai
     # Your existing code for creating the SHAP values
     explainer_shap = shap.DeepExplainer(second_model, extracted_train_data)
     shap_values = np.squeeze(explainer_shap.shap_values(extracted_test_data, check_additivity=False))
-    print(shap_values.shape)
 
     # Generate the SHAP summary plot without showing it
     shap.summary_plot(shap_values, features=extracted_test_data, feature_names=feature_names, show=False)
+
+    ax = plt.gca()
+
+    # Customize the x-axis to use the 10^x format
+    ax.xaxis.set_major_formatter(mtick.FuncFormatter(lambda x, _: f'$10^{{{int(x):d}}}$'))
+
 
     # Save the plot to a file
     plt.savefig(os.path.join(opt.save_dir, 'shap_summary_plot.png'))
@@ -354,4 +360,5 @@ if __name__ == '__main__':
   else:
     from utils.load_XJTU_data import train_1D, train_2D, train_extract, train_label_Con, train_label_RUL,\
                                      test_1D, test_2D, test_extract, test_label_Con, test_label_RUL
-    main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con)
+    # main_XJTU(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con)
+    main_XJTU_SHAP(opt, train_1D, train_2D, train_extract, train_label_RUL, train_label_Con, test_1D, test_2D, test_extract, test_label_RUL, test_label_Con)
